@@ -6,6 +6,7 @@ Created on Tue Dec  4 18:00:43 2018
 @author: karlchen
 """
 
+import randomstuff
 import os
 import numpy as np
 from array import array
