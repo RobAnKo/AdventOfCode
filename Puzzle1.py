@@ -777,7 +777,9 @@ matrix = np.matrix(l)
 
 car_symbols = ["v", "^", ">", "<"]
 dir_dic = {"v":[1,0],">":[0,1], "^":[-1,0], "<":[0,-1]}
-
+inv_dir_dic = {}
+for k,v in dir_dic.items():
+    inv_dir_dic[tuple(v)] = k
 class car():
     global matrix
     def __init__(self,ID, position, direction, next_turn):
@@ -786,15 +788,16 @@ class car():
         self.direction = direction
         self.next_turn = next_turn
         self.next_index = tuple([x+y for x,y in zip(self.position, self.direction)])
-        self.affected_tile = matrix[self.next_index[0],self.next_index[1]]
-    
+        self.affected_tile = matrix[self.next_index]
+        self.sitting_on = ""
+        
     def __repr__(self):
         return "Car "+str(self.ID)+ ", position "+ str(self.position)+ ", direction "+str(self.direction)+ ", next turn: "+self.next_turn+"\n"
     
     def move(self):
-        self.position = [x+y for x,y in zip(self.position,self.direction)]
+        self.position = self.
     
-    def turn(self):
+    def turn_cross(self):
         if self.next_turn == "left":
             self.next_turn = "straight"
             if self.direction == [0,1]:
@@ -826,13 +829,25 @@ class car():
             if self.direction == [-1,0]:
                 self.direction = [0,1]
                 return
-            
+    
+    
+    def update(self):
+        self.next_index = tuple([x+y for x,y in zip(self.position, self.direction)])
+        self.affected_tile = matrix[self.next_index]
+        
     def decide(self):
         if self.affected_tile in car_symbols:
             print("First crash: "+str(self.next_index))
             return
-        #if matrix()
-
+        if self.affected_tile == "+":
+            print("A Crossroad!")
+            matrix[position] = self.sitting_on
+            self.sitting_on = self.affected_tile
+            self.move()
+            self.turn()
+            self.update()
+            matrix[position] = inv_dir_dic[tuple(direction)]
+            
 def find_vehicle_positions(m, cs):
     idx = np.isin(m,cs)
     return np.where(idx)
