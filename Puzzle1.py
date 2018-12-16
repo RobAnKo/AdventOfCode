@@ -769,7 +769,6 @@ result = sum_from_gen(sum_dic,50000000000)
 class car():
     global matrix
     global cars
-    global vh
     def __init__(self,ID, position, direction, next_turn):
         self.ID = ID
         self.position = position
@@ -797,7 +796,6 @@ class car():
     def remove(self):
         matrix[self.position] = self.sitting_on
         cars.remove(self)
-        vh.remove(self.ID)
     
     def turn_cross(self):
         if self.next_turn == "left":
@@ -843,9 +841,9 @@ class car():
         if self.affected_tile in car_symbols:
             for other_car in cars:
                 if other_car.position == self.next_index:
-                    other_car.remove()
-            self.remove()
-            print("First crash: "+str(tuple(reversed(self.next_index))))
+                    other_car.crashed = True
+            self.crashed = True
+            print("Crash: "+str(tuple(reversed(self.next_index))))
             return(True)
         if self.affected_tile == "+":
             #print("A Crossroad!")
@@ -917,21 +915,31 @@ def find_vehicle_hierarchy(m, cs, cars):#cd):
          
                 
 def move_vehicles(m, vh, cars):#cd):
-    crashes = np.zeros_like(vh)
+    #crashes = np.zeros_like(vh)
     i=0
     for active_v in vh:
         for c in cars:
             if c.ID == active_v:
-                crash = c.decide()
-                if crash:
-                    crashes[i] = 1
-        i+=1
-    return crashes
+                if c.crashed:
+                    c.remove()
+                else:
+                    c.decide()
 
-
+def remove_crashes(cars):
+    crashfree = False
+    while 1>0:
+        if crashfree:
+            return
+        else:
+            for c in cars:
+                if c.crashed:
+                    c.remove()
+                    break
+            if not any([x.crashed for x in cars]):
+                crashfree = True
                
             
-infile = "puzzle13_testinput.txt"
+infile = "puzzle13_input.txt"
 with open(infile,"r") as f:
     l = f.readlines()
 l = [list(x.strip("\n")) for x in l]
@@ -947,8 +955,8 @@ for k,v in dir_dic.items():
             
 cars = initialize_vehicles(matrix, car_symbols)
 vh = find_vehicle_hierarchy(matrix, car_symbols, cars)
-crash = False
-i=0
+#crash = False
+#i=0
 #while not crash:
 #    i+=1
 #    print(i)
@@ -959,8 +967,11 @@ i=0
 #puzzle 13.2
 i=0
 while len(cars) > 1:
-    i+=1
-    print(i)
-    crashes = move_vehicles(matrix, vh, cars)
+    #i+=1
+    #print(i)
+    move_vehicles(matrix, vh, cars)
+    remove_crashes(cars)
+    print(len(cars))
     vh = find_vehicle_hierarchy(matrix,car_symbols,cars)
-
+    #np.savetxt("./arrays/array"+str(i)+".txt", matrix, fmt = '%1.1s',header = str(i))
+result = tuple(reversed(cars[0].position))
