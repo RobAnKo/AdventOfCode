@@ -832,8 +832,9 @@ class car():
         matrix[self.position] = inv_dir_dic[tuple(self.direction)]
 
     def decide(self):
+        self.update()
         if self.affected_tile in car_symbols:
-            print("First crash: "+str(self.next_index))
+            print("First crash: "+str(tuple(reversed(self.next_index))))
             return(True)
         if self.affected_tile == "+":
             #print("A Crossroad!")
@@ -935,6 +936,9 @@ i=0
 while not crash:
     i+=1
     print(i)
+    if i == 14:
+        print("exciting!")
     crash = move_vehicles(matrix, vh, cars)
     vh = find_vehicle_hierarchy(matrix, car_symbols, cars)
+    np.savetxt("./arrays/array"+str(i)+".txt", matrix, fmt = '%1.1s',header = str(i))
 
