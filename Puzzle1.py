@@ -779,11 +779,14 @@ car_symbols = ["v", "^", ">", "<"]
 dir_dic = {"v":[1,0],">":[0,1], "^":[-1,0], "<":[0,-1]}
 
 class car():
+    global matrix
     def __init__(self,ID, position, direction, next_turn):
         self.ID = ID
         self.position = position
         self.direction = direction
         self.next_turn = next_turn
+        self.next_index = tuple([x+y for x,y in zip(self.position, self.direction)])
+        self.affected_tile = matrix[self.next_index[0],self.next_index[1]]
     
     def __repr__(self):
         return "Car "+str(self.ID)+ ", position "+ str(self.position)+ ", direction "+str(self.direction)+ ", next turn: "+self.next_turn+"\n"
@@ -823,7 +826,12 @@ class car():
             if self.direction == [-1,0]:
                 self.direction = [0,1]
                 return
-
+            
+    def decide(self):
+        if self.affected_tile in car_symbols:
+            print("First crash: "+str(self.next_index))
+            return
+        #if matrix()
 
 def find_vehicle_positions(m, cs):
     idx = np.isin(m,cs)
@@ -837,7 +845,7 @@ def initialize_vehicles(matrix, car_symbols):
     for y,x in zip(pos[0],pos[1]):
         sign = matrix[y,x]
         #car_dic[c] = car(ID = c, position = [y,x], direction = dir_dic[sign], next_turn = "left")
-        cars.append(car(ID = c, position = [y,x], direction = dir_dic[sign], next_turn = "left"))
+        cars.append(car(ID = c, position = (y,x), direction = dir_dic[sign], next_turn = "left"))
         c+=1
     return cars#car_dic
 
@@ -859,7 +867,8 @@ def move_vehicles(m, vh, cars):#cd):
     for active_v in vh:
         for c in cars:
             if c.ID == active_v:
-                affected_tile = 
+                # = 
+                return
         
 
             
