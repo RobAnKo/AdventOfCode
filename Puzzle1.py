@@ -766,22 +766,9 @@ result = sum_from_gen(sum_dic,50000000000)
 
 #puzzle13
 
-infile = "puzzle13_input.txt"
-
-
-with open(infile,"r") as f:
-    l = f.readlines()
-
-l = [list(x.strip("\n")) for x in l]
-matrix = np.matrix(l)
-
-car_symbols = ["v", "^", ">", "<"]
-dir_dic = {"v":[1,0],">":[0,1], "^":[-1,0], "<":[0,-1]}
-inv_dir_dic = {}
-for k,v in dir_dic.items():
-    inv_dir_dic[tuple(v)] = k
 class car():
     global matrix
+    global crash
     def __init__(self,ID, position, direction, next_turn):
         self.ID = ID
         self.position = position
@@ -789,13 +776,22 @@ class car():
         self.next_turn = next_turn
         self.next_index = tuple([x+y for x,y in zip(self.position, self.direction)])
         self.affected_tile = matrix[self.next_index]
-        self.sitting_on = ""
+        self.sitting_on = self.initial_sit()
         
     def __repr__(self):
         return "Car "+str(self.ID)+ ", position "+ str(self.position)+ ", direction "+str(self.direction)+ ", next turn: "+self.next_turn+"\n"
     
+    def initial_sit(self):
+        if matrix[self.position] in ['>','<']:
+            return '-'
+        else:
+            return '|'
+    
     def move(self):
-        self.position = self.
+        matrix[self.position] = self.sitting_on
+        self.position = self.next_index
+        self.sitting_on = self.affected_tile
+        
     
     def turn_cross(self):
         if self.next_turn == "left":
@@ -829,25 +825,55 @@ class car():
             if self.direction == [-1,0]:
                 self.direction = [0,1]
                 return
-    
-    
+        
     def update(self):
         self.next_index = tuple([x+y for x,y in zip(self.position, self.direction)])
         self.affected_tile = matrix[self.next_index]
-        
+        matrix[self.position] = inv_dir_dic[tuple(self.direction)]
+
     def decide(self):
         if self.affected_tile in car_symbols:
             print("First crash: "+str(self.next_index))
-            return
+            return(True)
         if self.affected_tile == "+":
-            print("A Crossroad!")
-            matrix[position] = self.sitting_on
-            self.sitting_on = self.affected_tile
+            #print("A Crossroad!")
             self.move()
-            self.turn()
+            self.turn_cross()
             self.update()
-            matrix[position] = inv_dir_dic[tuple(direction)]
-            
+            return
+        elif self.affected_tile == '/':
+            self.move()
+            #print('A curve!')
+            if self.direction == [1,0]:
+                self.direction = [0,-1]
+            elif self.direction == [-1,0]:
+                self.direction = [0,1]
+            elif self.direction == [0,1]:
+                self.direction = [-1,0]
+            elif  self.direction == [0,-1]:
+                self.direction = [1,0]
+            self.update()
+            return
+        elif self.affected_tile == '\\':
+            self.move()
+            #print('A curve!')
+            if self.direction == [1,0]:
+                self.direction = [0,1]
+            elif  self.direction == [-1,0]:
+                self.direction = [0,-1]
+            elif self.direction == [0,1]:
+                self.direction = [1,0]
+            elif  self.direction == [0,-1]:
+                self.direction = [-1,0]
+            self.update()
+            return
+        if self.affected_tile in ["-","|"]:
+            self.move()
+            self.update()
+            return
+        if self.affected_tile == ' ':
+            print("SCREAM; ANGER; AGONY; OUT OF TRACK!")
+                
 def find_vehicle_positions(m, cs):
     idx = np.isin(m,cs)
     return np.where(idx)
@@ -873,7 +899,7 @@ def find_vehicle_hierarchy(m, cs, cars):#cd):
     for y,x in zip(pos[0],pos[1]):
         #for k,c in cd.items():
         for c in cars:
-            if c.position == [y,x]:
+            if c.position == (y,x):
                 seq.append(c.ID)
     return seq
          
@@ -882,18 +908,33 @@ def move_vehicles(m, vh, cars):#cd):
     for active_v in vh:
         for c in cars:
             if c.ID == active_v:
-                # = 
-                return
+                crash = c.decide()
+                if crash:
+                    return(crash)
+
+
         
+infile = "puzzle13_testinput.txt"
+with open(infile,"r") as f:
+    l = f.readlines()
+l = [list(x.strip("\n")) for x in l]
+matrix = np.matrix(l)
+
+car_symbols = ["v", "^", ">", "<"]
+
+dir_dic = {"v":[1,0],">":[0,1], "^":[-1,0], "<":[0,-1]}
+inv_dir_dic = {}
+for k,v in dir_dic.items():
+    inv_dir_dic[tuple(v)] = k
 
             
-    
-#things t,o keep track of:
-#position of vehicles + 
-#ids of vehicles + last action of vehicle
-#direction of vehicles
-pos = find_vehicle_positions(matrix, car_symbols)
-cd = initialize_vehicles(matrix, car_symbols)
-
-vh = find_vehicle_hierarchy(matrix, car_symbols, cd)
+cars = initialize_vehicles(matrix, car_symbols)
+vh = find_vehicle_hierarchy(matrix, car_symbols, cars)
+crash = False
+i=0
+while not crash:
+    i+=1
+    print(i)
+    crash = move_vehicles(matrix, vh, cars)
+    vh = find_vehicle_hierarchy(matrix, car_symbols, cars)
 
