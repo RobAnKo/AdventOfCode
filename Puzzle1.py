@@ -762,7 +762,7 @@ def sum_from_gen(sum_dic,gen):
     g = gen-g0
     return m*g+s0
 result = sum_from_gen(sum_dic,50000000000)
-'''
+
 
 #puzzle13
 
@@ -975,3 +975,27 @@ while len(cars) > 1:
     vh = find_vehicle_hierarchy(matrix,car_symbols,cars)
     #np.savetxt("./arrays/array"+str(i)+".txt", matrix, fmt = '%1.1s',header = str(i))
 result = tuple(reversed(cars[0].position))
+
+'''
+
+#puzzle14
+
+inp = 765071
+max_len = inp+10
+
+s = [3,7]
+val1 = 3
+pos1 = 0
+val2 = 7
+pos2 = 1
+l = len(s)
+while l < max_len:
+    newval= val1+val2
+    nv=[int(x) for x in str(newval)]
+    s.extend(nv)
+    l = len(s)
+    pos1 = (pos1+val1+1)%l
+    val1 = s[pos1]
+    pos2 = (pos2+val2+1)%l
+    val2 = s[pos2]
+print(s[inp:inp+10])
