@@ -976,26 +976,153 @@ while len(cars) > 1:
     #np.savetxt("./arrays/array"+str(i)+".txt", matrix, fmt = '%1.1s',header = str(i))
 result = tuple(reversed(cars[0].position))
 
-'''
 
-#puzzle14
+#puzzle14.1
 
+print("started at {}".format(datetime.now()))
 inp = 765071
+inps = str(inp)
 max_len = inp+10
 
-s = [3,7]
-val1 = 3
+s = "37"
+val1 = "3"
 pos1 = 0
-val2 = 7
+val2 = "7"
 pos2 = 1
 l = len(s)
-while l < max_len:
-    newval= val1+val2
-    nv=[int(x) for x in str(newval)]
-    s.extend(nv)
+broken = False
+while 0 < 1:
+    newval= int(val1)+int(val2)
+    if l%100000 == 0:
+        print("at {} we have {} letters".format(datetime.now(),len(s)))
+    nv=str(newval)
+    s += nv
     l = len(s)
-    pos1 = (pos1+val1+1)%l
+    pos1 = (pos1+int(val1)+1)%l
     val1 = s[pos1]
-    pos2 = (pos2+val2+1)%l
+    pos2 = (pos2+int(val2)+1)%l
     val2 = s[pos2]
-print(s[inp:inp+10])
+#s.find(inps)
+
+print("finished at {}".format(datetime.now()))
+
+'''
+#puzzle 16
+
+infile = "puzzle16_input.txt"
+
+with open(infile, "r") as f:
+    l = [x.strip() for x in f.readlines()]
+
+
+befores = [x.split(": ")[1].strip("[]").split(', ') for x in l if x.startswith("Bef")]
+befores = [[int(x) for x in y] for y in befores]
+afters = [x.split(":  ")[1].strip("[]").split(', ') for x in l if x.startswith("Aft")]
+afters = [[int(x) for x in y] for y in afters]
+opcodes = [[int(x) for x in y.split(" ")] for y in l if (y and y[0] in [str(i) for i in range(10)])]
+
+#functions
+
+
+
+
+def addr(p,rr):
+    r = rr.copy()
+    r[p[3]]=r[p[1]]+r[p[2]]
+    return r
+def addi(p,rr):
+    r = rr.copy()
+    r[p[3]]=r[p[1]]+p[2]
+    return r
+def mulr(p,rr):
+    r = rr.copy()
+    r[p[3]]=r[p[1]]*r[p[2]]
+    return r
+def muli(p,rr):
+    r = rr.copy()
+    r[p[3]]=r[p[1]]*p[2]
+    return r
+def banr(p,rr):
+    r = rr.copy()
+    r[p[3]]=r[p[1]]&r[p[2]]
+    return r
+def bani(p,rr):
+    r = rr.copy()
+    r[p[3]]=r[p[1]]&p[2]  
+    return r
+def borr(p,rr):
+    r = rr.copy()
+    r[p[3]]=r[p[1]]|r[p[2]]
+    return r
+def bori(p,rr):
+    r = rr.copy()
+    r[p[3]]=r[p[1]]|p[2]
+    return r
+def setr(p,rr):
+    r = rr.copy()
+    r[p[3]]=r[p[1]]
+    return r
+def seti(p,rr):
+    r = rr.copy()
+    r[p[3]]=p[1]
+    return r
+def gtir(p,rr):
+    r = rr.copy()
+    if p[1]>r[p[2]]:
+        r[p[3]] = 1
+    else:
+        r[p[3]] = 0
+    return r
+def gtri(p,rr):
+    r = rr.copy()
+    if r[p[1]]>p[2]:
+        r[p[3]] = 1
+    else:
+        r[p[3]] = 0
+    return r
+def gtrr(p,rr):
+    r = rr.copy()
+    if r[p[1]]>r[p[2]]:
+        r[p[3]] = 1
+    else:
+        r[p[3]] = 0
+    return r
+def eqir(p,rr):
+    r = rr.copy()
+    if p[1]==r[p[2]]:
+        r[p[3]] = 1
+    else:
+        r[p[3]] = 0
+    return r
+def eqri(p,rr):
+    r = rr.copy()
+    if r[p[1]]==p[2]:
+        r[p[3]] = 1
+    else:
+        r[p[3]] = 0
+    return r
+def eqrr(p,rr):
+    r = rr.copy()
+    if r[p[1]]==r[p[2]]:
+        r[p[3]] = 1
+    else:
+        r[p[3]] = 0
+    return r
+    
+funs = [addr, addi, mulr, muli, banr, bani, borr, bori, setr, seti, gtir, gtri, gtrr, eqir, eqri, eqrr]
+
+overthree = 0
+for b, p, a, in zip(befores, opcodes, afters):
+    per_chunk = 0
+    for f in funs:
+        if f(p, b) == a:
+            #print(f)
+            #print( str(f(p,b))+"  "+ str(a))
+            per_chunk +=1
+    if per_chunk ==2:
+        print(f)
+        print(p[0])
+        overthree+=1
+print(overthree)
+
+fun_dic={8:eqrr}
