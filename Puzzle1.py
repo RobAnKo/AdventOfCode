@@ -1111,18 +1111,65 @@ def eqrr(p,rr):
     
 funs = [addr, addi, mulr, muli, banr, bani, borr, bori, setr, seti, gtir, gtri, gtrr, eqir, eqri, eqrr]
 
-overthree = 0
-for b, p, a, in zip(befores, opcodes, afters):
+d = {}
+for i, b, p, a, in zip(range(len(befores)), befores, opcodes, afters):
     per_chunk = 0
+    d[i] = []
     for f in funs:
         if f(p, b) == a:
+            d[i].append(f)
             #print(f)
             #print( str(f(p,b))+"  "+ str(a))
             per_chunk +=1
-    if per_chunk ==2:
-        print(f)
-        print(p[0])
-        overthree+=1
-print(overthree)
+ 
 
+n_o_dic = {}
+it = 0
+while len(n_o_dic) < 16:
+    print("iteration"+str(it))
+    print(n_o_dic)
+    single_index = []
+    for k,v in d.items():
+        if len(v)==1:
+            single_index.append(k)
+    print("No of single indices:"+str(len(single_index)))
+    for s in single_index:
+        n = opcodes[s][0]
+        n_o_dic[n] = d[s]
+    fr = 0#functions removed from all possibilities 
+    remove_ks = []
+    dd = d.copy()
+    n_o_dicc=n_o_dic.copy()
+    for n,o in n_o_dicc.items():
+        print(o[0])
+        for k,v in dd.items():
+            if k == 772:
+                print("ah")                
+            if len(o)<1:
+                print("oh!")
+            if o[0] in v:
+                print(o[0].__repr__())
+                print("before removal: "+str(v))
+                d[k].remove(o[0])
+                if len(d[k])==0:
+                    remove_ks.append(k)
+                #print("after removal: "+str(v))
+                fr+=1
+            if n == opcodes[k]:
+                remove_ks.append(k)
+    for k in remove_ks:
+        d.pop(k)    
+    
+            
+    print("number of removed fun occurences: "+str(fr))
+    print("number of removed d entries: "+str(len(remove_ks)))
+    
+    it+=1
 fun_dic={8:eqrr}
+for k,v in d.items():
+    if len(v)==0:
+        print(k)
+        
+for k,v in d.items():
+    if len(v) <=1:
+        print(str(k)+": "+str(v))
