@@ -19,8 +19,8 @@ import scipy
 from scipy import signal
 from datetime import datetime
 import copy
-os.chdir("/home/karlchen/Desktop/AdventOfCode/")
-
+#os.chdir("~/home/karlchen/Desktop/AdventOfCode/")
+os.chdir("/home/robinkoch/Desktop/AdventOfCode")
 
 '''
 #puzzle1.1
@@ -1006,7 +1006,7 @@ while 0 < 1:
 
 print("finished at {}".format(datetime.now()))
 
-'''
+
 #puzzle 16
 
 infile = "puzzle16_input.txt"
@@ -1150,4 +1150,73 @@ for opcode in l:
     r = end_dic[o](opcode, r)
     print(r)
 result = r[0]
+'''
+#puzzle17
 
+
+def run_water(grid, spring):
+    switch = False
+    y = spring[0]
+    x = spring[1]
+    while True:
+        y_b = y+1
+        x_l = x-1
+        x_r = x+1
+        print(str(y),str(x))
+        if grid[y_b,x] == 0:
+            y = y_b
+            continue
+        elif grid[y_b, x] == 3:
+            switch = True
+        if grid[y,x_l] == 0:
+            x = x_l
+            continue
+        else:
+            break
+        if grid[y,x_r] == 0:
+            x = x_r
+            continue
+        else:
+            break
+    grid[y,x] = 3
+    return grid
+        
+infile = "puzzle17_input.txt"
+with open(infile, "r") as f:
+#    l = [x.strip() for x in f.readlines()]
+    l = [re.split("=|, ", x.strip()) for x in f.readlines()]
+
+df = pd.DataFrame({"x":[],"y":[]})
+ixs = []
+for line in l:
+    if line[0] == "x":
+        x = int(line[1])
+        y = [int(n) for n in line[3].split("..")]
+        ys = [int(y) for y in range(y[0], y[1]+1)]
+        for y in ys:
+            ixs.append([y,x])
+    elif line[0] == "y":
+        y = int(line[1])
+        x = [int(n) for n in line[3].split("..")]
+        xs = [int(x) for x in range(x[0], x[1]+1)]
+        for x in xs:
+            ixs.append([y,x])
+min_x = min([x[1] for x in ixs])
+max_x = max([x[1] for x in ixs])
+min_y = min([x[0] for x in ixs])
+max_y = max([x[0] for x in ixs])
+
+grid = np.zeros((max_y+10, max_x+10), dtype= int)
+for i in ixs:
+    grid[i[0],i[1]] = 1
+
+spring = [0,500]
+
+w = spring
+i=0
+while i<10:
+    grid = run_water(grid, spring)
+    print(i)
+    i+=1
+        
+ 
