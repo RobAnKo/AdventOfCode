@@ -18,7 +18,7 @@ from sortedcontainers import SortedSet
 import scipy
 from scipy import signal
 from datetime import datetime
-
+import copy
 os.chdir("/home/karlchen/Desktop/AdventOfCode/")
 
 
@@ -1110,14 +1110,16 @@ def eqrr(p,rr):
     return r
     
 funs = [addr, addi, mulr, muli, banr, bani, borr, bori, setr, seti, gtir, gtri, gtrr, eqir, eqri, eqrr]
-
+fun_num_dic = {}
+for f,n in zip(funs, range(1,len(funs)+1)):
+    fun_num_dic[f] = n
 d = {}
 for i, b, p, a, in zip(range(len(befores)), befores, opcodes, afters):
     per_chunk = 0
     d[i] = []
     for f in funs:
         if f(p, b) == a:
-            d[i].append(f)
+            d[i].append(fun_num_dic[f])
             #print(f)
             #print( str(f(p,b))+"  "+ str(a))
             per_chunk +=1
@@ -1127,49 +1129,36 @@ n_o_dic = {}
 it = 0
 while len(n_o_dic) < 16:
     print("iteration"+str(it))
-    print(n_o_dic)
-    single_index = []
     for k,v in d.items():
         if len(v)==1:
-            single_index.append(k)
-    print("No of single indices:"+str(len(single_index)))
-    for s in single_index:
-        n = opcodes[s][0]
-        n_o_dic[n] = d[s]
+            n = opcodes[k][0]
+            n_o_dic[n] = v[0]
     fr = 0#functions removed from all possibilities 
-    remove_ks = []
-    dd = d.copy()
-    n_o_dicc=n_o_dic.copy()
-    for n,o in n_o_dicc.items():
-        print(o[0])
-        for k,v in dd.items():
-            if k == 772:
-                print("ah")                
-            if len(o)<1:
+    for n,o in n_o_dic.items():
+        remove_ks = []
+        for k,v in d.items():
+            if not v:
                 print("oh!")
-            if o[0] in v:
-                print(o[0].__repr__())
-                print("before removal: "+str(v))
-                d[k].remove(o[0])
-                if len(d[k])==0:
+            if o in v:
+                #print(o[0].__repr__())
+                #print("before removal: "+str(v))
+                v.remove(o)
+                #d[k].remove(oo[0])
+                if len(v)==0:
                     remove_ks.append(k)
                 #print("after removal: "+str(v))
                 fr+=1
-            if n == opcodes[k]:
+        for k in remove_ks:
+            d.pop(k)
+        remove_ks = []
+        for k,v in d.items():
+            if opcodes[k][0] == o:
                 remove_ks.append(k)
-    for k in remove_ks:
-        d.pop(k)    
-    
-            
-    print("number of removed fun occurences: "+str(fr))
-    print("number of removed d entries: "+str(len(remove_ks)))
-    
+        for k in remove_ks:
+            d.pop(k)
+            print(len(d))
+            if len(d)==598:
+                print("ah")
+    #print("number of removed fun occurences: "+str(fr))
+    #print("number of removed d entries: "+str(len(remove_ks)))
     it+=1
-fun_dic={8:eqrr}
-for k,v in d.items():
-    if len(v)==0:
-        print(k)
-        
-for k,v in d.items():
-    if len(v) <=1:
-        print(str(k)+": "+str(v))
