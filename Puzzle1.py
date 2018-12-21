@@ -1020,12 +1020,8 @@ befores = [[int(x) for x in y] for y in befores]
 afters = [x.split(":  ")[1].strip("[]").split(', ') for x in l if x.startswith("Aft")]
 afters = [[int(x) for x in y] for y in afters]
 opcodes = [[int(x) for x in y.split(" ")] for y in l if (y and y[0] in [str(i) for i in range(10)])]
-
+os = [o[0] for o in opcodes]
 #functions
-
-
-
-
 def addr(p,rr):
     r = rr.copy()
     r[p[3]]=r[p[1]]+r[p[2]]
@@ -1110,55 +1106,48 @@ def eqrr(p,rr):
     return r
     
 funs = [addr, addi, mulr, muli, banr, bani, borr, bori, setr, seti, gtir, gtri, gtrr, eqir, eqri, eqrr]
-fun_num_dic = {}
-for f,n in zip(funs, range(1,len(funs)+1)):
-    fun_num_dic[f] = n
-d = {}
-for i, b, p, a, in zip(range(len(befores)), befores, opcodes, afters):
-    per_chunk = 0
-    d[i] = []
-    for f in funs:
-        if f(p, b) == a:
-            d[i].append(fun_num_dic[f])
-            #print(f)
-            #print( str(f(p,b))+"  "+ str(a))
-            per_chunk +=1
- 
 
-n_o_dic = {}
-it = 0
-while len(n_o_dic) < 16:
-    print("iteration"+str(it))
-    for k,v in d.items():
-        if len(v)==1:
-            n = opcodes[k][0]
-            n_o_dic[n] = v[0]
-    fr = 0#functions removed from all possibilities 
-    for n,o in n_o_dic.items():
-        remove_ks = []
-        for k,v in d.items():
-            if not v:
-                print("oh!")
-            if o in v:
-                #print(o[0].__repr__())
-                #print("before removal: "+str(v))
-                v.remove(o)
-                #d[k].remove(oo[0])
-                if len(v)==0:
-                    remove_ks.append(k)
-                #print("after removal: "+str(v))
-                fr+=1
-        for k in remove_ks:
-            d.pop(k)
-        remove_ks = []
-        for k,v in d.items():
-            if opcodes[k][0] == o:
-                remove_ks.append(k)
-        for k in remove_ks:
-            d.pop(k)
-            print(len(d))
-            if len(d)==598:
-                print("ah")
-    #print("number of removed fun occurences: "+str(fr))
-    #print("number of removed d entries: "+str(len(remove_ks)))
-    it+=1
+#intermezzo:find opcode-fun-connection
+
+#dictionary listing all indices for every o
+o_i_dic = {}
+for o in set(os):
+    o_i_dic[o] =[]
+for i in range(len(os)):
+    o_i_dic[os[i]].append(i)
+#dictionary listing all possible functions for every o
+o_f_dic = {}
+for o in set(os):
+    o_f_dic[o] =[]
+for o, ii in o_i_dic.items():
+    for i in ii:
+        for f in funs:
+            if f(opcodes[i], befores[i]) == afters[i] and f not in o_f_dic[o]:
+                o_f_dic[o].append(f)
+
+end_dic = {}
+while any([len(x) >0 for x in o_f_dic.values()]):
+    solved_fs = []
+    print(str([len(x) for x in o_f_dic.values()]))
+    for o,fs in o_f_dic.items():
+        if len(fs) == 1:
+            end_dic[o] = fs[0]
+            solved_fs.append(fs[0])
+    for sf in solved_fs:
+        for o,fs in o_f_dic.items():
+            if sf in fs:
+                fs.remove(sf)
+
+#16.2 
+infile = "puzzle16_2_input.txt"
+
+with open(infile, "r") as f:
+    l = [[int(x) for x in y.strip().split(" ")] for y in f.readlines()]
+
+r = [0,0,0,0]
+for opcode in l:
+    o = opcode[0]
+    r = end_dic[o](opcode, r)
+    print(r)
+result = r[0]
+
