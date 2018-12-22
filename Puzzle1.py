@@ -1153,32 +1153,40 @@ result = r[0]
 '''
 #puzzle17
 
-
+ii=0
 def run_water(grid, spring):
-    switch = False
+    global ii
+    flow = "left"
     y = spring[0]
     x = spring[1]
     while True:
         y_b = y+1
         x_l = x-1
         x_r = x+1
-        print(str(y),str(x))
+        #print(str(y),str(x))
         if grid[y_b,x] == 0:
             y = y_b
             continue
         elif grid[y_b, x] == 3:
-            switch = True
-        if grid[y,x_l] == 0:
-            x = x_l
-            continue
+            flow = "right"
+        if flow == "left":
+            if grid[y,x_l] == 0:
+                x = x_l
+                continue
+            else:
+                break
         else:
-            break
-        if grid[y,x_r] == 0:
-            x = x_r
-            continue
-        else:
-            break
+            if grid[y,x_r] == 0:
+                x = x_r
+                continue
+            else:
+                break
     grid[y,x] = 3
+    ii+=1
+    f = plt.figure()
+    sn.heatmap(grid[0:50,470:530])  
+    f.savefig("/home/robinkoch/testdir/take"+str(ii)+".png", format = "png")
+    plt.close()
     return grid
         
 infile = "puzzle17_input.txt"
@@ -1214,9 +1222,9 @@ spring = [0,500]
 
 w = spring
 i=0
-while i<10:
+while i<50:
     grid = run_water(grid, spring)
-    print(i)
+    #print(i)
     i+=1
         
  
