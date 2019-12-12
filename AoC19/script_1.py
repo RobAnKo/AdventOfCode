@@ -20,7 +20,7 @@ from scipy import signal
 from datetime import datetime
 import copy
 #os.chdir("~/home/karlchen/Desktop/AdventOfCode/")
-os.chdir("/home/robinkoch/Desktop/AdventOfCode")
+os.chdir("/home/robinkoch/Desktop/AdventOfCode/AoC19")
 
 
 def array_from_csv(inputfile):
@@ -747,7 +747,7 @@ for p in phase_state_combinations:
     outputs.append(output_val)
 
 print(max(outputs))
-'''
+
 #puzzle7.2
 
 
@@ -808,3 +808,46 @@ for phase_states in phase_state_combinations:
     outputs.append(current_end_output)
 print(max(outputs))
 
+'''
+
+
+#puzzle8.1
+
+def read_image_from_csv(inputfile, width, height):
+    with open(inputfile) as f:
+        data = f.readlines()
+        data = data[0].strip()
+        numbers = np.array([int(x) for x in data])
+    depth = int(len(numbers)/width/height)
+    #image = np.reshape(numbers, (height,width,-1), order = "C")
+    image = np.zeros((height,width,depth))
+    idx = 0
+    for d in range(depth):
+        for h in range(height):
+            for w in range(width):
+                image[h,w,d] = numbers[idx]
+                idx+=1
+    return(image)
+
+def checksum(image):
+    n_layers = image.shape[-1]
+    n_zeros = np.zeros(n_layers)
+    n_ones = np.zeros(n_layers)
+    n_twos = np.zeros(n_layers)
+    for l in range(n_layers):
+        layer = image[:,:,l]
+        n_zeros[l] = np.sum(layer==0)
+        n_ones[l] = np.sum(layer==1)
+        n_twos[l] = np.sum(layer==2)
+    min_layer = np.argmin(n_zeros)
+    out = n_ones[min_layer]*n_twos[min_layer]
+    return int(out)
+
+
+inputfile = "Input_8.txt"
+width = 25
+height = 6
+im = read_image_from_csv(inputfile,width,height)
+cs = checksum(im)
+
+print("Solution for puzzle 8.1:", cs)
