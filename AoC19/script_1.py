@@ -19,8 +19,7 @@ import scipy
 from scipy import signal
 from datetime import datetime
 import copy
-#os.chdir("~/home/karlchen/Desktop/AdventOfCode/")
-os.chdir("/home/robinkoch/Desktop/AdventOfCode/AoC19")
+os.chdir("/home/karlchen/Desktop/AdventOfCode/AoC19")
 
 
 def array_from_csv(inputfile):
@@ -573,7 +572,7 @@ end = G._Graph__graph_dict["SAN"]
 
 transfers = len(G.find_path(start[0],end[0]))-1
 
-'''
+
 #puzzle 7.2
 
 
@@ -707,7 +706,7 @@ def optcode_run(intcode,pointer_idx,instruction,initial_input):
             intcode[ix]=0
     
     return intcode,step, None
-'''
+
 #main function morphing the intcode
 def thruster_intcode_run(intcode,phase_setting,input_value):
     phasing = True
@@ -808,8 +807,6 @@ for phase_states in phase_state_combinations:
     outputs.append(current_end_output)
 print(max(outputs))
 
-'''
-
 
 #puzzle8.1
 
@@ -851,3 +848,220 @@ im = read_image_from_csv(inputfile,width,height)
 cs = checksum(im)
 
 print("Solution for puzzle 8.1:", cs)
+
+
+
+#puttle 8.2
+
+
+def render_image(image):
+    height = image.shape[0]
+    width = image.shape[1]
+    depth = image.shape[2]
+    resulting_img = np.zeros((height,width))
+    for h in range(height):
+        for w in range(width):
+            for d in range(depth):
+                if image[h,w,d] != 2:
+                    resulting_img[h,w] = image[h,w,d]
+                    break
+    return resulting_img
+	
+res_img = render_image(im)
+
+sn.heatmap(res_img)
+
+
+
+'''
+#puzzle9.1
+
+#get initial intcode
+def read_intcode_from_csv(inputfile):
+    intcode_array = array_from_csv(inputfile)
+    return intcode_array[0]
+    
+
+
+#get optcode ID and parameter modes from the instruction
+def parameters_from_instruction(instruction):
+    opcode = instruction%100
+    pm1 = ((instruction-opcode)%1000)
+    pm2 = (instruction-opcode)%10000 -pm1
+    pm3 = (instruction-opcode)%100000 -pm2 -pm1
+    
+    pm1 = int(round(pm1/100))
+    pm2 = int(round(pm2/1000))
+    pm3 = int(round(pm3/10000))
+    
+    return opcode,pm1,pm2,pm3
+
+#run optcode on intcode
+def optcode_run(intcode,pointer_idx,rel_base, instruction,initial_input):
+
+    #extract optcode and parameter modes
+    oc,pm1,pm2,pm3 = parameters_from_instruction(instruction)
+    try:
+        #3-parametered optcodes add() and multiply()
+        if oc==1 or oc==2:
+            
+            step = 4
+            
+            if pm1 == 0:        
+            	n1 = intcode[intcode[pointer_idx+1]]
+            elif pm1 == 1:
+                n1 = intcode[pointer_idx+1]
+            elif pm1 == 2:
+            	n1 = intcode[rel_base+intcode[pointer_idx+1]]
+                
+                
+            if pm2 == 0:        
+            	n2 = intcode[intcode[pointer_idx+2]]
+            elif pm2 == 1:
+                n2 = intcode[pointer_idx+2]
+            elif pm2 == 2:
+            	n1 = intcode[rel_base+intcode[pointer_idx+2]]
+            
+            
+            ix = intcode[pointer_idx+3]
+            
+        #1-parametered optcodes set() and return()
+        elif oc==3:
+            
+            step = 2
+            
+            ix = intcode[pointer_idx+1]
+            
+        elif oc==4:
+            
+            step = 2
+            
+            if pm1 == 0:#position mode
+                n1 = intcode[intcode[pointer_idx+1]]
+            elif pm1 == 1:#immediate mode
+                n1 = intcode[pointer_idx+1]
+            elif pm1 ==2:#relative mode
+                n1 = intcode[rel_base + intcode[pointer_idx+1]]
+                
+            
+        #2-parametered optcode to jump the pointer to second parameter depending on first parameter
+        elif oc==5 or oc==6:
+            
+            if pm1 == 0:#position mode
+                n1 = intcode[intcode[pointer_idx+1]]
+            elif pm1 == 1:#immediate mode
+                n1 = intcode[pointer_idx+1]
+            elif pm1 ==2:
+                n1 = intcode[rel_base+intcode[pointer_idx+1]]
+                
+            if pm2 == 0:#position mode
+                n2 = intcode[intcode[pointer_idx+2]]
+            elif pm2 == 1:#immediate mode
+                n2 = intcode[pointer_idx+2]
+            elif pm1 == 2:
+                n2 = intcode[rel_base+intcode[pointer_idx+2]]
+                
+            
+            if oc==5:
+                if n1:
+                    step = n2-pointer_idx
+                else:
+                    step = 3
+            
+            if oc==6:
+                if n1:
+                    step = 3
+                else:
+                    step = n2-pointer_idx
+            
+        #less than / equals
+        elif oc==7 or oc==8:
+            
+            step = 4
+            
+            if pm1 == 0:        
+            	n1 = intcode[intcode[pointer_idx+1]]
+            elif pm1 == 1:
+                n1 = intcode[pointer_idx+1]
+            elif pm1 == 2:
+            	n1 = intcode[rel_base+intcode[pointer_idx+1]]
+                
+            if pm2 == 0:        
+            	n2 = intcode[intcode[pointer_idx+2]]
+            elif pm2 == 1:
+                n2 = intcode[pointer_idx+2]
+            elif pm2 == 2:
+            	n1 = intcode[rel_base+intcode[pointer_idx+2]]
+            
+            ix = intcode[pointer_idx+3]
+            
+            
+            
+        elif oc == 9:
+            step = 2
+            
+            if pm1 == 0:#position mode
+                n1 = intcode[intcode[pointer_idx+1]]
+            elif pm1 == 1:#immediate mode
+                n1 = intcode[pointer_idx+1]
+            elif pm1 == 2:#relative mode
+                n1 = intcode[rel_base + intcode[pointer_idx+1]]
+        
+        #invalid optcode
+        else:
+            print("invalid optcode")
+            return None
+    except IndexError:
+        print("aha")
+    
+    if oc==1:
+        intcode[ix] = n1 + n2
+    elif oc==2:
+        intcode[ix] = n1 * n2
+    elif oc==3:
+        intcode[ix] = initial_input
+    elif oc==4:
+        return intcode,step,rel_base,n1 #n1 is the awesome output
+    elif oc==7:
+        if n1<n2:
+            intcode[ix]=1
+        else:
+            intcode[ix]=0
+    elif oc==8:
+        if n1==n2:
+            intcode[ix]=1
+        else:
+            intcode[ix]=0
+    elif oc==9:
+        rel_base += n1
+    
+    return intcode,step, rel_base, None
+
+#main function morphing the intcode
+def boost_intcode_run(intcode,input_value):
+    output_values = []
+    pointer=0
+    instruction = intcode[pointer]
+    rel_base = 0
+    #print(intcode)
+   #print("Pointer:",pointer,"Instruction:",instruction)
+    while instruction%100 != 99:
+        intcode,step,rel_base,output_val = optcode_run(intcode,
+                                                       pointer,
+                                                       rel_base,
+                                                       instruction,
+                                                       input_value)
+        output_values.append(output_val)
+        pointer+=step
+        instruction = intcode[pointer]
+        #print(intcode)
+        #print("Pointer:",pointer,"Instruction:",instruction)
+    return intcode, output_values
+        #print(intcode)
+
+inputfile = "Input_9.txt"
+intcode = read_intcode_from_csv(inputfile)
+intcode =[109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
+outcode, value = boost_intcode_run(intcode, 100)
+print(outcode)
+print(value)
