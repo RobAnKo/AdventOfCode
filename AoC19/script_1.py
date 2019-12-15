@@ -882,7 +882,13 @@ def read_intcode_from_csv(inputfile):
     return intcode_array[0]
     
 
-
+def trim_end(x):
+    for idx in range(len(x)-1,0,-1):
+        if x[idx] == 0:
+            x.pop(idx)
+        else:
+            return x
+        
 #get optcode ID and parameter modes from the instruction
 def parameters_from_instruction(instruction):
     opcode = instruction%100
@@ -894,174 +900,136 @@ def parameters_from_instruction(instruction):
     pm2 = int(round(pm2/1000))
     pm3 = int(round(pm3/10000))
     
-    return opcode,pm1,pm2,pm3
+    return opcode,[pm1,pm2,pm3]
 
 #run optcode on intcode
 def optcode_run(intcode,pointer_idx,rel_base, instruction,initial_input):
 
     #extract optcode and parameter modes
-    oc,pm1,pm2,pm3 = parameters_from_instruction(instruction)
-    try:
-        #3-parametered optcodes add() and multiply()
-        if oc==1 or oc==2:
-            
-            step = 4
-            
-            if pm1 == 0:        
-            	n1 = intcode[intcode[pointer_idx+1]]
-            elif pm1 == 1:
-                n1 = intcode[pointer_idx+1]
-            elif pm1 == 2:
-            	n1 = intcode[rel_base+intcode[pointer_idx+1]]
-                
-                
-            if pm2 == 0:        
-            	n2 = intcode[intcode[pointer_idx+2]]
-            elif pm2 == 1:
-                n2 = intcode[pointer_idx+2]
-            elif pm2 == 2:
-            	n1 = intcode[rel_base+intcode[pointer_idx+2]]
-            
-            
-            ix = intcode[pointer_idx+3]
-            
-        #1-parametered optcodes set() and return()
-        elif oc==3:
-            
-            step = 2
-            
-            ix = intcode[pointer_idx+1]
-            
-        elif oc==4:
-            
-            step = 2
-            
-            if pm1 == 0:#position mode
-                n1 = intcode[intcode[pointer_idx+1]]
-            elif pm1 == 1:#immediate mode
-                n1 = intcode[pointer_idx+1]
-            elif pm1 ==2:#relative mode
-                n1 = intcode[rel_base + intcode[pointer_idx+1]]
-                
-            
-        #2-parametered optcode to jump the pointer to second parameter depending on first parameter
-        elif oc==5 or oc==6:
-            
-            if pm1 == 0:#position mode
-                n1 = intcode[intcode[pointer_idx+1]]
-            elif pm1 == 1:#immediate mode
-                n1 = intcode[pointer_idx+1]
-            elif pm1 ==2:
-                n1 = intcode[rel_base+intcode[pointer_idx+1]]
-                
-            if pm2 == 0:#position mode
-                n2 = intcode[intcode[pointer_idx+2]]
-            elif pm2 == 1:#immediate mode
-                n2 = intcode[pointer_idx+2]
-            elif pm1 == 2:
-                n2 = intcode[rel_base+intcode[pointer_idx+2]]
-                
-            
-            if oc==5:
-                if n1:
-                    step = n2-pointer_idx
-                else:
-                    step = 3
-            
-            if oc==6:
-                if n1:
-                    step = 3
-                else:
-                    step = n2-pointer_idx
-            
-        #less than / equals
-        elif oc==7 or oc==8:
-            
-            step = 4
-            
-            if pm1 == 0:        
-            	n1 = intcode[intcode[pointer_idx+1]]
-            elif pm1 == 1:
-                n1 = intcode[pointer_idx+1]
-            elif pm1 == 2:
-            	n1 = intcode[rel_base+intcode[pointer_idx+1]]
-                
-            if pm2 == 0:        
-            	n2 = intcode[intcode[pointer_idx+2]]
-            elif pm2 == 1:
-                n2 = intcode[pointer_idx+2]
-            elif pm2 == 2:
-            	n1 = intcode[rel_base+intcode[pointer_idx+2]]
-            
-            ix = intcode[pointer_idx+3]
-            
-            
-            
-        elif oc == 9:
-            step = 2
-            
-            if pm1 == 0:#position mode
-                n1 = intcode[intcode[pointer_idx+1]]
-            elif pm1 == 1:#immediate mode
-                n1 = intcode[pointer_idx+1]
-            elif pm1 == 2:#relative mode
-                n1 = intcode[rel_base + intcode[pointer_idx+1]]
-        
-        #invalid optcode
-        else:
-            print("invalid optcode")
-            return None
-    except IndexError:
-        print("aha")
+    oc,pms = parameters_from_instruction(instruction)
     
+    #extract indices of parameters
+    idxs = [idx for idx in range(pointer_idx+1,pointer_idx+4)]
+
+    #extract parameter values
+    params = [intcode[x] for x in idxs[:]]
+    
+    if oc in [3,4,9]:
+        params = params[:2]
+    elif oc in [5,6]:
+        params = params[0:3]
+    elif oc in [1,2,7,8]:
+        params = params
+    
+    #pad with 0s 
+    intcode.extend([0 for x in range(max(params)-len(intcode)+1)])
+
+    #adjust idxs depending on parameter modes
+    for pos,pm in enumerate(pms):
+        if pm == 0:
+            idxs[pos] = intcode[idxs[pos]]
+        elif pm ==1:
+            idxs[pos] = idxs[pos]
+        elif pm == 2:
+            idxs[pos] = intcode[idxs[pos]]+rel_base
+    intcode.extend([0 for x in range(max(idxs)-len(intcode)+1)])
+    n1 = intcode[idxs[1]]
+    n2 = intcode[idxs[2]]
+    n3 = idxs[3]
+    
+    #3-parametered optcodes add() and multiply()
+    if oc==1 or oc==2:
+        
+        step = 4
+        
+    elif oc==3 or oc==4:
+        
+        step = 2
+        
+    elif oc==5:
+        if n1:
+            step = n2-pointer_idx
+        else:
+            step = 3
+        
+    elif oc==6:
+        if n1:
+            step = 3
+        else:
+            step = n2-pointer_idx
+        
+    #less than / equals
+    elif oc==7 or oc==8:
+        
+        step = 4
+        
+    elif oc == 9:
+        step = 2
+        
+    #invalid optcode
+    else:
+        print("invalid optcode")
+        return None
+
     if oc==1:
-        intcode[ix] = n1 + n2
+        intcode[n3] = n1 + n2
     elif oc==2:
-        intcode[ix] = n1 * n2
+        intcode[n3] = n1 * n2
     elif oc==3:
-        intcode[ix] = initial_input
+        intcode[n1] = initial_input
     elif oc==4:
+        intcode = trim_end(intcode)
         return intcode,step,rel_base,n1 #n1 is the awesome output
     elif oc==7:
         if n1<n2:
-            intcode[ix]=1
+            intcode[n3]=1
         else:
-            intcode[ix]=0
+            intcode[n3]=0
     elif oc==8:
         if n1==n2:
-            intcode[ix]=1
+            intcode[n3]=1
         else:
-            intcode[ix]=0
+            intcode[n3]=0
     elif oc==9:
         rel_base += n1
     
+    #print(instruction, pointer_idx, rel_base)
+    intcode = trim_end(intcode)
     return intcode,step, rel_base, None
 
 #main function morphing the intcode
 def boost_intcode_run(intcode,input_value):
+    initial_size = len(intcode)
     output_values = []
     pointer=0
     instruction = intcode[pointer]
     rel_base = 0
-    #print(intcode)
-   #print("Pointer:",pointer,"Instruction:",instruction)
+    
     while instruction%100 != 99:
+        print(intcode)
+        print("Pointer:",pointer,"Instruction:",instruction,"base:",rel_base)
+        if pointer==2:
+            print("aha")
         intcode,step,rel_base,output_val = optcode_run(intcode,
                                                        pointer,
                                                        rel_base,
                                                        instruction,
                                                        input_value)
-        output_values.append(output_val)
+        
+        if not output_val is None:
+            output_values.append(output_val)
         pointer+=step
         instruction = intcode[pointer]
         #print(intcode)
         #print("Pointer:",pointer,"Instruction:",instruction)
-    return intcode, output_values
+    return intcode[:initial_size], output_values
         #print(intcode)
 
 inputfile = "Input_9.txt"
 intcode = read_intcode_from_csv(inputfile)
-intcode =[109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
+orig_intcode = [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
+intcode = copy.deepcopy(orig_intcode)
+intcode = [1102,34915192,34915192,7,4,7,99,0]
 outcode, value = boost_intcode_run(intcode, 100)
 print(outcode)
 print(value)
