@@ -7,19 +7,9 @@ Created on Sat Dec 14 01:59:19 2019
 """
 
 import os
-import numpy as np
-from array import array
 import pandas as pd
-import itertools
-import matplotlib.pyplot as plt
-import seaborn as sn
-import re
-from sortedcontainers import SortedSet
-import scipy
-from scipy import signal
-from datetime import datetime
 import copy
-from typing import List,Optional,Dict, Iterable
+from typing import List,Dict,Iterable
 os.chdir("/home/karlchen/Desktop/AdventOfCode/AoC19")
 
 class IntCoder:
