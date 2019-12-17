@@ -9,19 +9,7 @@ Created on Sun Dec 15 17:25:54 2019
 
 import os
 import numpy as np
-from array import array
-import pandas as pd
-import itertools
-import matplotlib.pyplot as plt
 import seaborn as sn
-import re
-from sortedcontainers import SortedSet
-import scipy
-from scipy import signal
-from datetime import datetime
-import copy
-import math
-from typing import Tuple,Iterable,List
 #os.chdir("/home/karlchen/Desktop/AdventOfCode/AoC19")
 os.chdir("/home/robinkoch/Desktop/AdventOfCode/AoC19")
 
