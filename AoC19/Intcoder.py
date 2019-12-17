@@ -10,7 +10,7 @@ import os
 import pandas as pd
 import copy
 from typing import List,Dict,Iterable
-os.chdir("/home/karlchen/Desktop/AdventOfCode/AoC19")
+
 
 class IntCoder:
     
@@ -138,6 +138,7 @@ class IntCoder:
         
     def _halt(self, mode1,mode2,mode3):
         self._done = True
+        return(-1)
         
     
     def _reset_memory(self):
@@ -160,17 +161,17 @@ class IntCoder:
     #running the intcode until we halt
     def run(self,input_value = 0):
         self._input_value = input_value
-        self._n_steps =0
-        self._pointer_idxs = []
-        self._pointer_values = []
-        self._rel_bases = []
+        #self._n_steps =0
+        #self._pointer_idxs = []
+        #self._pointer_values = []
+        #self._rel_bases = []
         outs = []
         while not self._done:
-            self._pointer_idxs.append(self._pointer)
-            self._pointer_values.append(self._memory[self._pointer])
-            self._rel_bases.append(self._relative_base)
+            #self._pointer_idxs.append(self._pointer)
+            #self._pointer_values.append(self._memory[self._pointer])
+            #self._rel_bases.append(self._relative_base)
             potential_output = self._step()
-            self._n_steps +=1
+            #self._n_steps +=1
             if potential_output is not None:
                 outs.append(potential_output)
         return(outs)
