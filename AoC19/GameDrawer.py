@@ -51,7 +51,7 @@ class GameDrawer(IntCoder):
         
 
         
-    
+'''    
 #puzzle13.1
 inputfile = "Input_13.txt"
 intcode = GameDrawer.read_from_file(inputfile)
@@ -64,7 +64,7 @@ sol = np.nonzero(drawer._grid == 4)
 #puzzle13.2
 drawer._done = False
 drawer.play()
-
+'''
 
 
 
