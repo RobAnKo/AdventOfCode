@@ -28,15 +28,10 @@ def array_from_csv(inputfile):
     return pd.read_csv(inputfile, header = None).values
 
 
-#puzzle1.1 & 1.2 together
+# puzzle 1.1 & 1.2 together
 inputfile = "input_1.txt"
 numbers = array_from_csv(inputfile)
 
-# def multiply_2020_sum(numbers):
-#     for i in numbers:
-#         for j in numbers:
-#             if i+j == 2020:
-#                 return(i*j)
 
 def multiply_2020_sum(numbers,n):
     combs = list(itertools.combinations(numbers, n))
@@ -63,10 +58,12 @@ print(multiply_2020_sum(numbers,3))
 ####
 
 
-#puzzle2.1
+# puzzle 2
 inputfile = "input_2.txt"
 pws = array_from_csv(inputfile)
 
+
+# puzzle 2.1
 def number_of_valid_pws(pws):
     n = 0
     for pw in pws:
@@ -84,7 +81,7 @@ def number_of_valid_pws(pws):
 
 print(number_of_valid_pws(pws))
         
-
+# puzzle 2.2
 def number_of_valid_pws_2(pws):
     n = 0
     for pw in pws:
@@ -102,3 +99,19 @@ def number_of_valid_pws_2(pws):
     return n
 
 print(number_of_valid_pws_2(pws))
+
+
+# puzzle 3
+inputfile = "input_3.txt"
+X = array_from_csv(inputfile)
+
+
+# puzzle 3.1
+def fun_3_1(X):
+    return out
+
+
+# puzzle 3.2
+def fun_3_2(X):
+    return out
+
