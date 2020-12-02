@@ -15,8 +15,8 @@ from typing import List,Dict,Iterable
 class IntCoder:
     
     def __init__(self,memory: List[int]) -> None:
-        self._memory = memory
         self._original_memory = copy.deepcopy(memory)
+        self._memory = copy.deepcopy(memory)
         self._pointer: int = 0
         self._relative_base: int = 0
         self._extended_memory: Dict[int:int] = {}

@@ -97,21 +97,22 @@ outmat = np.array(outmat, dtype="int")
 
 #outmat[(np.sum(outmat,axis=1)<100),:] = 0
 #outmat[:,(np.sum(outmat,axis=0)<100)] = 0
-# plt.matshow(mask)
+
 
 
 hotspots = np.zeros(outmat.shape)
-for y in range(outmat.shape[0]):
-    for x in range(outmat.shape[1]):
+for y in range(outmat.shape[0]-99):
+    for x in range(outmat.shape[1]-99):
         if outmat[y,x]:
             if outmat[y+99,x]:
                 if outmat[y,x+99]:
                     if outmat[y+99,x+99]:
                         hotspots[y,x]=1
 
+plt.matshow(outmat)
+plt.matshow(hotspots)
 
 
-
-max_idxs = np.argmax(mask)
+max_idxs = np.argwhere(hotspots)
 #diffy = outmat_rep-outmat
 np.save("beam2000x2000_heur",outmat)
