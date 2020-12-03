@@ -104,13 +104,9 @@ end
 % puzzle 3.2
 function res = fun_3_2(mountain)
     directions = {[1,1],[1,3],[1,5],[1,7],[2,1]};
-    n = length(directions);
     res = 1;
-    for i =1:n
-        disp(directions{i});
-        x = fun_3_1(mountain, directions{i});
-        disp(x);
-        res = res * x;
+    for i =1:length(directions);
+        res = res * fun_3_1(mountain, directions{i});
     end
 end
 
