@@ -103,15 +103,33 @@ print(number_of_valid_pws_2(pws))
 
 # puzzle 3
 inputfile = "input_3.txt"
-X = array_from_csv(inputfile)
-
+mountain = array_from_csv(inputfile).astype('str')
+directions = [[1,1],[3,1],[5,1],[7,1],[1,2]]
 
 # puzzle 3.1
-def fun_3_1(X):
-    return out
+def tree_encounters(mountain, direction):
+    h = len(mountain)
+    w = len(mountain[0][0])
+    posx = direction[0]
+    posy = direction[1]
+    path = ""
+    while posy < h:
+        path += mountain[posy][0][posx]
+        posx += direction[0]
+        posy += direction[1]
+        if posx >= w:
+            posx -= w
+    print(path.count("#"))
+    return path.count("#")
+
+print(tree_encounters(mountain, directions[1]))
 
 
 # puzzle 3.2
-def fun_3_2(X):
-    return out
+def multiple_tree_encounters(mountain, directions):
+    tree_mult = 1
+    for i in range(len(directions)):
+        tree_mult *= tree_encounters(mountain, directions[i]);
+    return tree_mult
 
+print(multiple_tree_encounters(mountain, directions))
