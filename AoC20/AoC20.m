@@ -16,14 +16,32 @@ disp(fun_2_2(passwords));
 
 % puzzle 3
 
-fp = "input_2.txt";
-X = readtable(fullfile(overdir, fp), 'ReadVariableNames', false);
-disp(fun_3_1(X));
-disp(fun_3_2(X));
+fp = "input_3.txt";
+mountain = read_txt(fullfile(overdir, fp));
+direction = [1,3];
+disp(fun_3_1(mountain,direction));
+res2 = fun_3_2(mountain);
 
 
 
 %% Functions
+
+%helper to read text into file
+function res = read_txt(fp)
+    fid = fopen(fp);
+    line1 = fgetl(fid);
+    res=line1;
+    while ischar(line1) 
+        line1 = fgetl(fid);
+        if  ~(line1 == -1)
+            res =char(res,line1);
+        end
+    end
+    fclose(fid);
+end
+
+
+
 
 % puzzle 1.1
 function res = fun_1_1(numbers)
@@ -65,13 +83,34 @@ function res = fun_2_2(passwords)
     res = sum(rowfun(@(x,y,z) xor(x==y, x==z), passwords(:,{'letters','l_at_i1', 'l_at_i2'}),'OutputFormat', 'uniform'));
 end
 
+
 % puzzle 3.1
-function res = fun_3_1(passwords)
-    res = ;
+function res = fun_3_1(mountain, direction)
+    path = "";
+    posy = 1 + direction(1);
+    posx = 1 + direction(2);
+    [h,w] = size(mountain);
+    while posy <= h
+        path=path+string(mountain(posy, posx));
+        posy = posy+direction(1);
+        posx = posx+direction(2);
+        if posx>w
+            posx = posx-w;
+        end
+    end
+    res = count(path, '#');
 end
 
 % puzzle 3.2
-function res = fun_3_2(passwords)
-    res = ;
+function res = fun_3_2(mountain)
+    directions = {[1,1],[1,3],[1,5],[1,7],[2,1]};
+    n = length(directions);
+    res = 1;
+    for i =1:n
+        disp(directions{i});
+        x = fun_3_1(mountain, directions{i});
+        disp(x);
+        res = res * x;
+    end
 end
 
