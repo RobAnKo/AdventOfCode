@@ -2,8 +2,8 @@ library(tidyverse)
 library(magrittr)
 
 
-#input_dir <- "/home/robinkoch/Documents/AdventOfCode/AoC20/"
-input_dir <- "/home/karlchen/Documents/AdventOfCode/AoC20/"
+input_dir <- "/home/robinkoch/Documents/AdventOfCode/AoC20/"
+#input_dir <- "/home/karlchen/Documents/AdventOfCode/AoC20/"
 
 #puzzle 1
 inp_file <- "input_1.txt"
@@ -72,11 +72,37 @@ df %>%
 
 inp_file = "input_3.txt"
 fp = paste(input_dir, inp_file, sep = "")
-x = read.table(fp)
-
+mountain = read.delim(fp, header = FALSE, sep = "\n")[[1]]
+directions = list(c(1,1),c(1,3),c(1,5),c(1,7),c(2,1))
 # puzzle 3.1
+
+n_trees_encountered <- function(mountain, direction) {
+  h = length(mountain)
+  w = str_length(mountain[1])
+  posx <- direction[2] +1
+  posy <- direction[1] +1
+  path <- ""
+  while (posy <= h) {
+    path <-  paste(path, substring(mountain[posy], posx, posx), sep="")
+    posx <- posx + direction[2]
+    posy <- posy + direction[1]
+    if (posx > w) {
+      posx <- posx-w
+    }
+  }
+  return(str_count(path, "#"))
+}
+
+res1 <- n_trees_encountered(mountain, directions[[2]]) 
 
 # puzzle 3.2
 
+multiple_slope_trees <- function(mountain, directions){
+  result <- 1
+  for (i in 1:length(directions)) {
+    result <- result * n_trees_encountered(mountain, directions[[i]])
+  }
+  return(result)
+}
 
-
+res2 <- multiple_slope_trees(mountain, directions)
