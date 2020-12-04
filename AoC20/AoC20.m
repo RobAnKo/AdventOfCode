@@ -15,13 +15,18 @@ disp(fun_2_1(passwords));
 disp(fun_2_2(passwords));
 
 % puzzle 3
-
 fp = "input_3.txt";
 mountain = read_txt(fullfile(overdir, fp));
 direction = [1,3];
 disp(fun_3_1(mountain,direction));
-res2 = fun_3_2(mountain);
+disp(fun_3_2(mountain));
 
+% puzzle 4
+fp = "input_4.txt";
+passport_data = read_txt(fullfile(overdir, fp));
+needed_keys = {'ecl','pid','eyr','hcl','byr','iyr','hgt'};
+disp(fun_4_1(passport_data, needed_keys));
+disp(fun_4_2(passport_data, needed_keys));
 
 
 %% Functions
@@ -33,9 +38,7 @@ function res = read_txt(fp)
     res=line1;
     while ischar(line1) 
         line1 = fgetl(fid);
-        if  ~(line1 == -1)
-            res =char(res,line1);
-        end
+        res =char(res,line1);
     end
     fclose(fid);
 end
@@ -105,8 +108,109 @@ end
 function res = fun_3_2(mountain)
     directions = {[1,1],[1,3],[1,5],[1,7],[2,1]};
     res = 1;
-    for i =1:length(directions);
+    for i =1:length(directions)
         res = res * fun_3_1(mountain, directions{i});
     end
 end
+
+
+% puzzle 4.1
+function res = fun_4_1(passport_data, needed_keys)
+    res = 0;
+    ppd = string(passport_data);
+    splits = arrayfun(@(x) isempty(regexp(x, '\w', 'once')), ppd);
+    pp_string = "";
+    for i = 1:length(splits)
+        if ~splits(i)
+            pp_string = pp_string + ppd(i);
+        else
+            res = res + pp_keys_are_valid(pp_string, needed_keys);
+            pp_string = "";
+        end
+    end
+end
+
+function valid = pp_keys_are_valid(pp_string, needed_keys)
+    valid = 0;
+    sp = split(pp_string, " ");
+    sp = arrayfun(@(x) split(x, ":"), sp(~(sp=="")), 'UniformOutput', false);
+    keys = cellfun(@(x) x{1},sp, 'UniformOutput', false);
+    if all(contains(needed_keys, keys))
+        valid = 1;
+    end
+end
+
+
+% puzzle 4.2
+function res = fun_4_2(passport_data, needed_keys)
+    res = 0;
+    ppd = string(passport_data);
+    splits = arrayfun(@(x) isempty(regexp(x, '\w', 'once')), ppd);
+    pp_string = "";
+    for i = 1:length(splits)
+        if ~splits(i)
+            pp_string = pp_string + ppd(i);
+        else
+            res = res + (pp_keys_are_valid(pp_string, needed_keys) & pp_values_are_valid(pp_string));
+            pp_string = "";
+        end
+    end
+end
+
+
+
+function valid = pp_values_are_valid(pp_string)
+    valid = 0;
+    sp = split(pp_string, " ");
+    sp = arrayfun(@(x) split(x, ":"), sp(~(sp=="")), 'UniformOutput', false);
+    keys = cellfun(@(x) x{1}, sp, 'UniformOutput', false);
+    values = cellfun(@(x) x{2}, sp, 'UniformOutput', false);
+    valids = zeros(length(keys),1);
+    for i = 1:length(keys)
+        valids(i) = rule_function(keys{i}, values{i});
+    end
+    if all(valids)
+        valid = 1;
+    end
+end
+    
+function valid = rule_function(key, value)
+    switch key
+        case 'byr'
+            num =str2double(value);
+            valid = (length(value)==4) && (1920 <= num) && (num <= 2002);  
+        case 'iyr'
+            num =str2double(value);
+            valid = (length(value)==4) && (2010 <= num) && (num <= 2020);
+        case 'eyr'
+            num =str2double(value);
+            valid = (length(value)==4) && (2020 <= num) && (num <= 2030);
+        case 'hgt'
+            unit = regexp(value, "[a-z]*" ,'match');
+            hgt = str2double(regexp(value, "\d*", 'match'));
+            switch unit{:}
+                case "cm"
+                    valid = (150 <= hgt) && (hgt <= 193);
+                case "in"
+                    valid = (59 <= hgt) && (hgt <= 76);
+                otherwise
+                    valid = 0;
+            end
+        case 'hcl'
+            valid = startsWith(value, "#") & length(value)==7 & isempty(regexp(value(2:end), "[^0-9a-f]", 'once'));
+        case 'ecl'
+            colors = {'amb' 'blu' 'brn' 'gry' 'grn' 'hzl' 'oth'};
+            valid = any(cellfun(@(x) all(x == value), colors));
+        case 'pid'
+            valid = (length(value)==9 & ~isnan(str2double(value)));
+        case 'cid'
+            valid = 1;
+    end            
+end
+
+% 
+% hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
+% ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
+% pid (Passport ID) - a nine-digit number, including leading zeroes.
+
 

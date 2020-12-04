@@ -11,7 +11,6 @@ fp = paste(input_dir, inp_file, sep = "")
 numbers = read.table(fp)
 
 # puzzle 1.1
-# which 2 numbers add up to 2020?
 nums <- numbers %>%
   mutate(V2 = V1) %>% 
   expand(V1,V2) %>%
@@ -69,13 +68,12 @@ df %>%
   length
 
 # puzzle 3
-
 inp_file = "input_3.txt"
 fp = paste(input_dir, inp_file, sep = "")
 mountain = read.delim(fp, header = FALSE, sep = "\n")[[1]]
 directions = list(c(1,1),c(1,3),c(1,5),c(1,7),c(2,1))
-# puzzle 3.1
 
+# puzzle 3.1
 n_trees_encountered <- function(mountain, direction) {
   h = length(mountain)
   w = str_length(mountain[1])
@@ -96,7 +94,6 @@ n_trees_encountered <- function(mountain, direction) {
 res1 <- n_trees_encountered(mountain, directions[[2]]) 
 
 # puzzle 3.2
-
 multiple_slope_trees <- function(mountain, directions){
   result <- 1
   for (i in 1:length(directions)) {
@@ -106,3 +103,13 @@ multiple_slope_trees <- function(mountain, directions){
 }
 
 res2 <- multiple_slope_trees(mountain, directions)
+
+
+# puzzle 4
+inp_file = "input_4.txt"
+fp = paste(input_dir, inp_file, sep = "")
+passport_data = read.delim(fp, header = FALSE, sep = "\n")[[1]]
+
+# puzzle 4.1
+
+# puzzle 4.2

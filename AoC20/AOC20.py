@@ -133,3 +133,21 @@ def multiple_tree_encounters(mountain, directions):
     return tree_mult
 
 print(multiple_tree_encounters(mountain, directions))
+
+# puzzle 4
+inputfile = "input_4.txt"
+passport_data = array_from_csv(inputfile).astype('str')
+
+
+# puzzle 4.1
+def valid_passports(passport_data):
+    return num_valid
+
+print(valid_passports(passport_data))
+
+
+# puzzle 4.2
+def fun_4_2(passport_data):
+    return 0
+
+print(fun_4_2(passport_data))
