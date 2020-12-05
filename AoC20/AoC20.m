@@ -188,29 +188,29 @@ function valid = rule_function(key, value)
         case 'hgt'
             unit = regexp(value, "[a-z]*" ,'match');
             hgt = str2double(regexp(value, "\d*", 'match'));
-            switch unit{:}
-                case "cm"
-                    valid = (150 <= hgt) && (hgt <= 193);
-                case "in"
-                    valid = (59 <= hgt) && (hgt <= 76);
-                otherwise
-                    valid = 0;
+            if ~isempty(unit)
+                switch unit{:}
+                    case "cm"
+                        valid = (150 <= hgt) && (hgt <= 193);
+                    case "in"
+                        valid = (59 <= hgt) && (hgt <= 76);
+                    otherwise
+                        valid = 0;
+                end
+            else
+                valid = 0;
             end
         case 'hcl'
             valid = startsWith(value, "#") & length(value)==7 & isempty(regexp(value(2:end), "[^0-9a-f]", 'once'));
         case 'ecl'
             colors = {'amb' 'blu' 'brn' 'gry' 'grn' 'hzl' 'oth'};
-            valid = any(cellfun(@(x) all(x == value), colors));
+            valid = length(value)==3 && any(cellfun(@(x) all(x == value), colors));
         case 'pid'
-            valid = (length(value)==9 & ~isnan(str2double(value)));
+            valid = length(value)==9 && ~isnan(str2double(value));
         case 'cid'
             valid = 1;
     end            
 end
 
-% 
-% hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
-% ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
-% pid (Passport ID) - a nine-digit number, including leading zeroes.
 
 
