@@ -28,6 +28,11 @@ needed_keys = {'ecl','pid','eyr','hcl','byr','iyr','hgt'};
 disp(fun_4_1(passport_data, needed_keys));
 disp(fun_4_2(passport_data, needed_keys));
 
+% puzzle 6
+fp = "input_6.txt";
+custom_q_data = read_txt(fullfile(overdir, fp));
+disp(fun_6_1(custom_q_data));
+disp(fun_6_2(custom_q_data));
 
 %% Functions
 
@@ -213,4 +218,61 @@ function valid = rule_function(key, value)
 end
 
 
+% puzzle 6.1
 
+function res = fun_6_1(custom_q_data)
+    res = 0;
+    cqd = string(custom_q_data);
+    splits = arrayfun(@(x) isempty(regexp(x, '\w', 'once')), cqd);
+    answers = {};
+    ai = 1;
+    for i = 1:length(splits)
+        if ~splits(i)
+            answers{ai} = char(regexp(cqd(i), "\w+", 'match'));
+            ai = ai+1;
+        else
+            res = res + length(munion(answers{:}));
+            answers = {};
+            ai = 1;
+        end
+    end
+end
+
+function U = munion(varargin)
+    % MUNION - union of multiple sets
+    % U = UNION(S1,S2,S3, ..., Sn) returns the union of sets S1 to Sn
+    U = varargin{1} ;
+    for k=2:nargin
+       U = union(U, varargin{k});
+    end
+end
+
+% puzzle 6.2
+function res = fun_6_2(custom_q_data)
+    res = 0;
+    cqd = string(custom_q_data);
+    splits = arrayfun(@(x) isempty(regexp(x, '\w', 'once')), cqd);
+    answers = {};
+    ai = 1;
+    for i = 1:length(splits)
+        if ~splits(i)
+            answers{ai} = char(regexp(cqd(i), "\w+", 'match'));
+            ai = ai+1;
+        else
+            res = res + length(mintersect(answers{:}));
+            answers = {};
+            ai = 1;
+        end
+    end
+end
+
+
+
+function I = mintersect(varargin)
+    % mintersect - intersection of multiple sets
+    % I = intersect(S1,S2,S3, ..., Sn) returns the intersect of sets S1 to Sn
+    I = varargin{1} ;
+    for k=2:nargin
+       I = intersect(I, varargin{k});
+    end
+end
