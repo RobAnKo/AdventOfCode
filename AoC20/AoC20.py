@@ -279,3 +279,84 @@ def number_of_subbags(motherbag, bag_dict):
 print(number_of_subbags("shinygold", bag_dict)-1) #should be 
 
 
+# puzzle 8
+inputfile = "input_8.txt"
+instructions = lines_from_txt(inputfile)
+instructions_visited = [0]*len(instructions)
+accumulator = 0
+
+
+#puzzle 8.1
+def follow_instruction(pointer = 0):
+    global instructions
+    global instructions_visited
+    global accumulator
+    
+    if instructions_visited[pointer]:
+        return accumulator
+    else:
+        instructions_visited[pointer] = 1
+        instruction = instructions[pointer]
+        typ = instruction[0:3]
+        if typ == "nop":
+            return follow_instruction(pointer+1)
+        elif typ == "acc":
+            accumulator+= int(instruction[4:])
+            return follow_instruction(pointer+1)
+        elif typ == "jmp":
+            return follow_instruction(pointer+int(instruction[4:]))
+        
+
+print(follow_instruction())
+
+#puzzle 8.2
+
+def follow_instruction_2(instructions, pointer=0):
+    global instructions_visited
+    global accumulator
+    
+    if pointer==len(instructions):
+        return accumulator
+    elif instructions_visited[pointer]:
+        return None
+    else:
+        instructions_visited[pointer] = 1
+        instruction = instructions[pointer]
+        typ = instruction[0:3]
+        if typ == "nop":
+            return follow_instruction_2(instructions,pointer+1)
+        elif typ == "acc":
+            accumulator+= int(instruction[4:])
+            return follow_instruction_2(instructions,pointer+1)
+        elif typ == "jmp":
+            return follow_instruction_2(instructions,pointer+int(instruction[4:]))
+
+
+def mutate_instructions(instructions):
+    idxs = np.where([True if (x.startswith("nop") or x.startswith("jmp")) else False for x in instructions])[0]
+    n = len(idxs)
+    list_of_mutated_instructions = [None] * n
+    for i in range(n):
+        list_of_mutated_instructions[i] = mutate_instruction(instructions, idxs[i])
+    return list_of_mutated_instructions
+
+def mutate_instruction(instructions, i):
+    instructions_copy = copy.copy(instructions)
+    if instructions[i].startswith("jmp"):
+        instructions_copy[i] = re.sub("jmp", "nop", instructions[i])
+    elif instructions[i].startswith("nop"):
+        instructions_copy[i] = re.sub("nop", "jmp", instructions[i])
+    else:
+        print("Here should be either a 'jmp' or a 'nop' statement, but neither is here!")
+    return instructions_copy
+
+list_of_mutated_instructions = mutate_instructions(instructions)
+
+res = [None]*len(list_of_mutated_instructions)
+
+for i in range(len(list_of_mutated_instructions)):
+    instructions_visited = [0]*len(instructions)
+    accumulator = 0
+    res[i] = follow_instruction_2(list_of_mutated_instructions[i])
+
+print(res[np.where(res)[0][0]])
