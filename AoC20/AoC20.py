@@ -214,149 +214,210 @@ def lines_from_txt(inputfile, form = "string"):
 
 
 # puzzle 7
-inputfile = "input_7.txt"
-bag_data = lines_from_txt(inputfile)
+# inputfile = "input_7.txt"
+# bag_data = lines_from_txt(inputfile)
 
 
 
-def bag_dict_from_bag_data(bag_data, with_number = False):
-    bag_dict = dict()
-    for line in bag_data:
-        sp = line.split(" contain ")
-        k = "".join(sp[0].split(" ")[0:2])
-        if not with_number:
-            content = re.sub('[ .]|\d|bags|bag', '', sp[1]).split(",")
-        else:
-            contents = re.sub('[ .]|bags|bag', '', sp[1]).split(",")
-            colors = [re.search('([a-z]+)', bag).group() for bag in contents]
-            if colors[0] == "noother":
-                content = None
-            else:
-                numbers = [int(re.search('(\d)', bag).group()) for bag in contents]
-                content = dict(zip(colors, numbers))
-        bag_dict[k] = content
-    return bag_dict
+# def bag_dict_from_bag_data(bag_data, with_number = False):
+#     bag_dict = dict()
+#     for line in bag_data:
+#         sp = line.split(" contain ")
+#         k = "".join(sp[0].split(" ")[0:2])
+#         if not with_number:
+#             content = re.sub('[ .]|\d|bags|bag', '', sp[1]).split(",")
+#         else:
+#             contents = re.sub('[ .]|bags|bag', '', sp[1]).split(",")
+#             colors = [re.search('([a-z]+)', bag).group() for bag in contents]
+#             if colors[0] == "noother":
+#                 content = None
+#             else:
+#                 numbers = [int(re.search('(\d)', bag).group()) for bag in contents]
+#                 content = dict(zip(colors, numbers))
+#         bag_dict[k] = content
+#     return bag_dict
 
 
 
-# puzzle 7.1
-bag_dict = bag_dict_from_bag_data(bag_data, with_number = False)
-all_bags = list(bag_dict.keys())
+# # puzzle 7.1
+# bag_dict = bag_dict_from_bag_data(bag_data, with_number = False)
+# all_bags = list(bag_dict.keys())
 
-def contains_bag_of_interest(motherbags, bag_of_interest, bag_dict):
-    if isinstance(motherbags, set):
-        motherbags = set([x for x in motherbags if not x=='noother'])
-        subbags = set([bag for motherbag in motherbags for bag in bag_dict[motherbag]])
-    else:
-        subbags = set(bag_dict[motherbags])
+# def contains_bag_of_interest(motherbags, bag_of_interest, bag_dict):
+#     if isinstance(motherbags, set):
+#         motherbags = set([x for x in motherbags if not x=='noother'])
+#         subbags = set([bag for motherbag in motherbags for bag in bag_dict[motherbag]])
+#     else:
+#         subbags = set(bag_dict[motherbags])
         
-    #base case 1: we found the bag
-    if bag_of_interest in subbags:
-        return 1
-    #base case 2: there are no subbags anymore
-    if not subbags:
-        return 0
-    #recursive case: go deeper
-    else:
-        return contains_bag_of_interest(subbags, bag_of_interest, bag_dict)
+#     #base case 1: we found the bag
+#     if bag_of_interest in subbags:
+#         return 1
+#     #base case 2: there are no subbags anymore
+#     if not subbags:
+#         return 0
+#     #recursive case: go deeper
+#     else:
+#         return contains_bag_of_interest(subbags, bag_of_interest, bag_dict)
 
 
-print(sum((contains_bag_of_interest(bag, "shinygold", bag_dict) for bag in all_bags)))
+# print(sum((contains_bag_of_interest(bag, "shinygold", bag_dict) for bag in all_bags)))
 
-# puzzle 7.2
+# # puzzle 7.2
 
-bag_dict = bag_dict_from_bag_data(bag_data, with_number = True)
+# bag_dict = bag_dict_from_bag_data(bag_data, with_number = True)
 
-def number_of_subbags(motherbag, bag_dict):
-    subbags = bag_dict[motherbag]
-    #base case: no bags inside
-    if subbags == None:
-        return 1
-    else:
-        return 1+ sum((v*number_of_subbags(k, bag_dict) for k,v in subbags.items()))
-
-
-print(number_of_subbags("shinygold", bag_dict)-1) #should be 
+# def number_of_subbags(motherbag, bag_dict):
+#     subbags = bag_dict[motherbag]
+#     #base case: no bags inside
+#     if subbags == None:
+#         return 1
+#     else:
+#         return 1+ sum((v*number_of_subbags(k, bag_dict) for k,v in subbags.items()))
 
 
-# puzzle 8
-inputfile = "input_8.txt"
-instructions = lines_from_txt(inputfile)
-instructions_visited = [0]*len(instructions)
-accumulator = 0
+# print(number_of_subbags("shinygold", bag_dict)-1) #should be 
 
 
-#puzzle 8.1
-def follow_instruction(pointer = 0):
-    global instructions
-    global instructions_visited
-    global accumulator
+# # puzzle 8
+# inputfile = "input_8.txt"
+# instructions = lines_from_txt(inputfile)
+# instructions_visited = [0]*len(instructions)
+# accumulator = 0
+
+
+# #puzzle 8.1
+# def follow_instruction(pointer = 0):
+#     global instructions
+#     global instructions_visited
+#     global accumulator
     
-    if instructions_visited[pointer]:
-        return accumulator
-    else:
-        instructions_visited[pointer] = 1
-        instruction = instructions[pointer]
-        typ = instruction[0:3]
-        if typ == "nop":
-            return follow_instruction(pointer+1)
-        elif typ == "acc":
-            accumulator+= int(instruction[4:])
-            return follow_instruction(pointer+1)
-        elif typ == "jmp":
-            return follow_instruction(pointer+int(instruction[4:]))
+#     if instructions_visited[pointer]:
+#         return accumulator
+#     else:
+#         instructions_visited[pointer] = 1
+#         instruction = instructions[pointer]
+#         typ = instruction[0:3]
+#         if typ == "nop":
+#             return follow_instruction(pointer+1)
+#         elif typ == "acc":
+#             accumulator+= int(instruction[4:])
+#             return follow_instruction(pointer+1)
+#         elif typ == "jmp":
+#             return follow_instruction(pointer+int(instruction[4:]))
         
 
-print(follow_instruction())
+# print(follow_instruction())
 
-#puzzle 8.2
+# #puzzle 8.2
 
-def follow_instruction_2(instructions, pointer=0):
-    global instructions_visited
-    global accumulator
+# def follow_instruction_2(instructions, pointer=0):
+#     global instructions_visited
+#     global accumulator
     
-    if pointer==len(instructions):
-        return accumulator
-    elif instructions_visited[pointer]:
+#     if pointer==len(instructions):
+#         return accumulator
+#     elif instructions_visited[pointer]:
+#         return None
+#     else:
+#         instructions_visited[pointer] = 1
+#         instruction = instructions[pointer]
+#         typ = instruction[0:3]
+#         if typ == "nop":
+#             return follow_instruction_2(instructions,pointer+1)
+#         elif typ == "acc":
+#             accumulator+= int(instruction[4:])
+#             return follow_instruction_2(instructions,pointer+1)
+#         elif typ == "jmp":
+#             return follow_instruction_2(instructions,pointer+int(instruction[4:]))
+
+
+# def mutate_instructions(instructions):
+#     idxs = np.where([True if (x.startswith("nop") or x.startswith("jmp")) else False for x in instructions])[0]
+#     n = len(idxs)
+#     list_of_mutated_instructions = [None] * n
+#     for i in range(n):
+#         list_of_mutated_instructions[i] = mutate_instruction(instructions, idxs[i])
+#     return list_of_mutated_instructions
+
+# def mutate_instruction(instructions, i):
+#     instructions_copy = copy.copy(instructions)
+#     if instructions[i].startswith("jmp"):
+#         instructions_copy[i] = re.sub("jmp", "nop", instructions[i])
+#     elif instructions[i].startswith("nop"):
+#         instructions_copy[i] = re.sub("nop", "jmp", instructions[i])
+#     else:
+#         print("Here should be either a 'jmp' or a 'nop' statement, but neither is here!")
+#     return instructions_copy
+
+# list_of_mutated_instructions = mutate_instructions(instructions)
+
+# res = [None]*len(list_of_mutated_instructions)
+
+# for i in range(len(list_of_mutated_instructions)):
+#     instructions_visited = [0]*len(instructions)
+#     accumulator = 0
+#     res[i] = follow_instruction_2(list_of_mutated_instructions[i])
+
+# print(res[np.where(res)[0][0]])
+
+
+
+# puzzle 9
+inputfile = "input_9.txt"
+numbers = lines_from_txt(inputfile, form = "int")
+
+# puzzle 9.1
+def check_number(numbers,index,preambel_length):
+    if index < preambel_length:
+        return False
+    
+    num = numbers[index]
+    preambel = numbers[index-preambel_length:index]
+    combs = itertools.combinations(preambel, 2);
+    sums = set((sum(x) for x in combs))
+    if num in sums:
+        return False
+    else:
+        return True
+
+preambel_length = 25
+idx = np.array([check_number(numbers, i, preambel_length) for i in range(len(numbers))]).nonzero()[0][0]
+print(numbers[idx])
+
+# puzzle 9.2
+target = numbers[idx];
+
+def contiguous_sum_from_end(numbers, start, target):
+    s = 0
+    ixs = iter(range(start, 0, -1))
+    while s<target:
+        ix = ixs.__next__()
+        s+= numbers[ix]
+    if s == target:
+        return ix
+    else:
         return None
-    else:
-        instructions_visited[pointer] = 1
-        instruction = instructions[pointer]
-        typ = instruction[0:3]
-        if typ == "nop":
-            return follow_instruction_2(instructions,pointer+1)
-        elif typ == "acc":
-            accumulator+= int(instruction[4:])
-            return follow_instruction_2(instructions,pointer+1)
-        elif typ == "jmp":
-            return follow_instruction_2(instructions,pointer+int(instruction[4:]))
 
 
-def mutate_instructions(instructions):
-    idxs = np.where([True if (x.startswith("nop") or x.startswith("jmp")) else False for x in instructions])[0]
-    n = len(idxs)
-    list_of_mutated_instructions = [None] * n
-    for i in range(n):
-        list_of_mutated_instructions[i] = mutate_instruction(instructions, idxs[i])
-    return list_of_mutated_instructions
 
-def mutate_instruction(instructions, i):
-    instructions_copy = copy.copy(instructions)
-    if instructions[i].startswith("jmp"):
-        instructions_copy[i] = re.sub("jmp", "nop", instructions[i])
-    elif instructions[i].startswith("nop"):
-        instructions_copy[i] = re.sub("nop", "jmp", instructions[i])
-    else:
-        print("Here should be either a 'jmp' or a 'nop' statement, but neither is here!")
-    return instructions_copy
+possible_idxs = range(idx-1,0,-1);
 
-list_of_mutated_instructions = mutate_instructions(instructions)
+for upper in possible_idxs:
+    lower = contiguous_sum_from_end(numbers, upper, target)
+    if lower:
+        print(max(numbers[lower:upper+1])+min(numbers[lower:upper+1]))
+        break
+    
 
-res = [None]*len(list_of_mutated_instructions)
+    
 
-for i in range(len(list_of_mutated_instructions)):
-    instructions_visited = [0]*len(instructions)
-    accumulator = 0
-    res[i] = follow_instruction_2(list_of_mutated_instructions[i])
 
-print(res[np.where(res)[0][0]])
+
+
+
+
+
+
+
+
