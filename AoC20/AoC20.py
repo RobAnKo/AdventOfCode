@@ -20,9 +20,10 @@ from scipy import signal
 from datetime import datetime
 import copy
 import time
+from math import comb as mathcomb
 from functools import reduce
-#os.chdir("/home/robinkoch/Documents/AdventOfCode/AoC20")
-os.chdir("/home/karlchen/Documents/AdventOfCode/AoC20")
+os.chdir("/home/robinkoch/Documents/AdventOfCode/AoC20")
+#os.chdir("/home/karlchen/Documents/AdventOfCode/AoC20")
 
 
 
@@ -53,11 +54,11 @@ def lines_from_txt(inputfile, form = "string"):
 #     return(int(mults[mults.nonzero()]))
 
 
-# def mult(args):
-#     prod = 1
-#     for a in args:
-#         prod *=a
-#     return prod
+def mult(args):
+    prod = 1
+    for a in args:
+        prod *=a
+    return prod
 
 
 
@@ -411,20 +412,63 @@ def lines_from_txt(inputfile, form = "string"):
 #        break
     
 
-    
+# puzzle 10
 inputfile = "input_10.txt"
 numbers = lines_from_txt(inputfile, form = "int")
+#add outlet and charging
+numbers.extend([0,max(numbers)+3])
 
-# puzzle 9.1
-def sorted_differences(numbers):
+# puzzle 10.1
+def sorted_diffs(numbers):
     s = sorted(numbers)
-    d0 = [s[0]]
-    diffs = np.array(d0 + list(np.diff(s)) + [3])
-    
-    n1 = sum(diffs==1)
-    n3 = sum(diffs==3)
-    return n1*n3
+    diffs = np.diff(s)
+    return diffs
 
-out = sorted_differences(numbers)
+out = sorted_diffs(numbers)
+print(sum(out==1)*sum(out==3))
 
 
+#puzzle 10.2
+def find_poppable_idxs(numbers):
+    s = sorted(numbers)
+    diffs = np.diff(s)
+    pop_idxs = [0]*len(s)
+    for ix in range(1,len(s)):
+        if all(diffs[ix-1:ix+1] == 1):
+            pop_idxs[ix] = 1
+    return pop_idxs
+
+
+def number_of_options(n):
+    n_all_options = sum((mathcomb(n,k) for k in range(n,-1,-1)))
+    n_invalid_options = invalid_options(n)
+    return(n_all_options-n_invalid_options)
+
+
+def invalid_options(l):
+    return sum(range(1,l-1))
+
+def find_mutable_sections(numbers):
+    idxs = find_poppable_idxs(numbers)
+    section_dict = dict()
+    i=0
+    while i < len(idxs):
+        if idxs[i]:
+            k=i;
+            n = 1
+            i+=1
+            while idxs[i]:
+                n+=1
+                i+=1
+            section_dict[k] = n
+        else:
+            i+=1
+    return section_dict
+
+
+
+sec_dict = find_mutable_sections(numbers)
+
+noo = [number_of_options(v) for v in sec_dict.values()]
+
+res = mult(noo)
