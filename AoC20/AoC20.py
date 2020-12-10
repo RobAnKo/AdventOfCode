@@ -21,7 +21,8 @@ from datetime import datetime
 import copy
 import time
 from functools import reduce
-os.chdir("/home/robinkoch/Documents/AdventOfCode/AoC20")
+#os.chdir("/home/robinkoch/Documents/AdventOfCode/AoC20")
+os.chdir("/home/karlchen/Documents/AdventOfCode/AoC20")
 
 
 
@@ -364,60 +365,66 @@ def lines_from_txt(inputfile, form = "string"):
 
 
 # puzzle 9
-inputfile = "input_9.txt"
+#inputfile = "input_9.txt"
+#numbers = lines_from_txt(inputfile, form = "int")
+#
+## puzzle 9.1
+#def check_number(numbers,index,preambel_length):
+#    if index < preambel_length:
+#        return False
+#    
+#    num = numbers[index]
+#    preambel = numbers[index-preambel_length:index]
+#    combs = itertools.combinations(preambel, 2);
+#    sums = set((sum(x) for x in combs))
+#    if num in sums:
+#        return False
+#    else:
+#        return True
+#
+#preambel_length = 25
+#idx = np.array([check_number(numbers, i, preambel_length) for i in range(len(numbers))]).nonzero()[0][0]
+#print(numbers[idx])
+#
+## puzzle 9.2
+#target = numbers[idx];
+#
+#def contiguous_sum_from_end(numbers, start, target):
+#    s = 0
+#    ixs = iter(range(start, 0, -1))
+#    while s<target:
+#        ix = ixs.__next__()
+#        s+= numbers[ix]
+#    if s == target:
+#        return ix
+#    else:
+#        return None
+#
+#
+#
+#possible_idxs = range(idx-1,0,-1);
+#
+#for upper in possible_idxs:
+#    lower = contiguous_sum_from_end(numbers, upper, target)
+#    if lower:
+#        print(max(numbers[lower:upper+1])+min(numbers[lower:upper+1]))
+#        break
+    
+
+    
+inputfile = "input_10.txt"
 numbers = lines_from_txt(inputfile, form = "int")
 
 # puzzle 9.1
-def check_number(numbers,index,preambel_length):
-    if index < preambel_length:
-        return False
+def sorted_differences(numbers):
+    s = sorted(numbers)
+    d0 = [s[0]]
+    diffs = np.array(d0 + list(np.diff(s)) + [3])
     
-    num = numbers[index]
-    preambel = numbers[index-preambel_length:index]
-    combs = itertools.combinations(preambel, 2);
-    sums = set((sum(x) for x in combs))
-    if num in sums:
-        return False
-    else:
-        return True
+    n1 = sum(diffs==1)
+    n3 = sum(diffs==3)
+    return n1*n3
 
-preambel_length = 25
-idx = np.array([check_number(numbers, i, preambel_length) for i in range(len(numbers))]).nonzero()[0][0]
-print(numbers[idx])
-
-# puzzle 9.2
-target = numbers[idx];
-
-def contiguous_sum_from_end(numbers, start, target):
-    s = 0
-    ixs = iter(range(start, 0, -1))
-    while s<target:
-        ix = ixs.__next__()
-        s+= numbers[ix]
-    if s == target:
-        return ix
-    else:
-        return None
-
-
-
-possible_idxs = range(idx-1,0,-1);
-
-for upper in possible_idxs:
-    lower = contiguous_sum_from_end(numbers, upper, target)
-    if lower:
-        print(max(numbers[lower:upper+1])+min(numbers[lower:upper+1]))
-        break
-    
-
-    
-
-
-
-
-
-
-
-
+out = sorted_differences(numbers)
 
 
