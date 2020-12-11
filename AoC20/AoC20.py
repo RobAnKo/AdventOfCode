@@ -40,6 +40,12 @@ def lines_from_txt(inputfile, form = "string"):
         print('form has to be one of ["string", "float", "int"]')
         return None
 
+#helper function for multiplication of all elements in an iterable
+def mult(args):
+    prod = 1
+    for a in args:
+        prod *=a
+    return prod
 
 
 # # puzzle 1.1 & 1.2 together
@@ -52,13 +58,6 @@ def lines_from_txt(inputfile, form = "string"):
 #     sums = [sum(x) for x in combs]
 #     mults = np.array([mult(x) if y==2020 else 0 for x,y in zip(combs,sums)])
 #     return(int(mults[mults.nonzero()]))
-
-
-def mult(args):
-    prod = 1
-    for a in args:
-        prod *=a
-    return prod
 
 
 

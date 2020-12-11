@@ -2,37 +2,43 @@
 
 overdir = "/home/robinkoch/Documents/AdventOfCode/AoC20";
 
-%puzzle 1
-fp = "input_1.txt";
-numbers = csvread(fullfile(overdir, fp));
-disp(fun_1_1(numbers));
-disp(fun_1_2(numbers));
+% %puzzle 1
+% fp = "input_1.txt";
+% numbers = csvread(fullfile(overdir, fp));
+% disp(fun_1_1(numbers));
+% disp(fun_1_2(numbers));
+% 
+% %puzzle 2
+% fp = "input_2.txt";
+% passwords = readtable(fullfile(overdir, fp), 'ReadVariableNames', false);
+% disp(fun_2_1(passwords));
+% disp(fun_2_2(passwords));
+% 
+% % puzzle 3
+% fp = "input_3.txt";
+% mountain = read_txt(fullfile(overdir, fp));
+% direction = [1,3];
+% disp(fun_3_1(mountain,direction));
+% disp(fun_3_2(mountain));
+% 
+% % puzzle 4
+% fp = "input_4.txt";
+% passport_data = read_txt(fullfile(overdir, fp));
+% needed_keys = {'ecl','pid','eyr','hcl','byr','iyr','hgt'};
+% disp(fun_4_1(passport_data, needed_keys));
+% disp(fun_4_2(passport_data, needed_keys));
+% 
+% % puzzle 6
+% fp = "input_6.txt";
+% custom_q_data = read_txt(fullfile(overdir, fp));
+% disp(fun_6_1(custom_q_data));
+% disp(fun_6_2(custom_q_data));
+% 
 
-%puzzle 2
-fp = "input_2.txt";
-passwords = readtable(fullfile(overdir, fp), 'ReadVariableNames', false);
-disp(fun_2_1(passwords));
-disp(fun_2_2(passwords));
-
-% puzzle 3
-fp = "input_3.txt";
-mountain = read_txt(fullfile(overdir, fp));
-direction = [1,3];
-disp(fun_3_1(mountain,direction));
-disp(fun_3_2(mountain));
-
-% puzzle 4
-fp = "input_4.txt";
-passport_data = read_txt(fullfile(overdir, fp));
-needed_keys = {'ecl','pid','eyr','hcl','byr','iyr','hgt'};
-disp(fun_4_1(passport_data, needed_keys));
-disp(fun_4_2(passport_data, needed_keys));
-
-% puzzle 6
-fp = "input_6.txt";
-custom_q_data = read_txt(fullfile(overdir, fp));
-disp(fun_6_1(custom_q_data));
-disp(fun_6_2(custom_q_data));
+%puzzle 11
+fp = "input_11.txt";
+seating = read_txt(fullfile(overdir,fp));
+disp(fun_11_1(seating));
 
 %% Functions
 
@@ -43,7 +49,9 @@ function res = read_txt(fp)
     res=line1;
     while ischar(line1) 
         line1 = fgetl(fid);
-        res =char(res,line1);
+        if ischar(line1)
+            res =char(res,line1);
+        end
     end
     fclose(fid);
 end
@@ -276,3 +284,52 @@ function I = mintersect(varargin)
        I = intersect(I, varargin{k});
     end
 end
+
+
+%puzzle 11.1
+
+function res = fun_11_1(seating)
+    seat_matrix = seating == 'L';
+    seat_idxs = find(seat_matrix)';
+    occupation_matrix = zeros(size(seat_matrix));
+    earlier_occupation_matrix = ones(size(seat_matrix));
+    n_updates = 0;
+    while any(occupation_matrix ~= earlier_occupation_matrix,'all')
+        earlier_occupation_matrix = occupation_matrix;
+        disp("UPDATE!");
+        occupation_matrix = update_occ_matrix(occupation_matrix, seat_idxs);
+        n_updates = n_updates + 1;
+    end
+    res = sum(occupation_matrix, 'all');
+    disp("We had "+n_updates+" update cycles.");
+end
+
+function updated_occ_mat = update_occ_matrix(occ_mat, seat_idxs)
+    updated_occ_mat = occ_mat;
+    for i = seat_idxs
+        if occ_mat(i)
+            if count_neighbours(occ_mat,i) >= 4
+                updated_occ_mat(i) = 0;
+            end
+        else
+            if count_neighbours(occ_mat,i) == 0
+                updated_occ_mat(i) = 1;
+            end
+        end
+    end
+end
+
+    
+function n = count_neighbours(mat, i)
+%disp("count "+i+"!");
+sz = size(mat);
+[y,x] = ind2sub(size(mat),i);
+xs = (max(1,x-1):min(x+1,sz(2)));
+ys = (max(1,y-1):min(y+1,sz(1)));
+n = sum(mat(ys,xs),'all')-mat(i);
+end
+
+
+
+
+
