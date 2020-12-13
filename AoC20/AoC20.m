@@ -39,6 +39,7 @@ overdir = "/home/robinkoch/Documents/AdventOfCode/AoC20";
 fp = "input_11.txt";
 seating = read_txt(fullfile(overdir,fp));
 disp(fun_11_1(seating));
+disp(fun_11_2(seating));
 
 %% Functions
 
@@ -296,27 +297,40 @@ function res = fun_11_1(seating)
     n_updates = 0;
     while any(occupation_matrix ~= earlier_occupation_matrix,'all')
         earlier_occupation_matrix = occupation_matrix;
-        disp("UPDATE!");
-        occupation_matrix = update_occ_matrix(occupation_matrix, seat_idxs);
+        occupation_matrix = update_occ_matrix(occupation_matrix, seat_idxs, "sight");
         n_updates = n_updates + 1;
     end
     res = sum(occupation_matrix, 'all');
     disp("We had "+n_updates+" update cycles.");
 end
 
-function updated_occ_mat = update_occ_matrix(occ_mat, seat_idxs)
+function updated_occ_mat = update_occ_matrix(occ_mat, seat_idxs, type_of)
     updated_occ_mat = occ_mat;
-    for i = seat_idxs
-        if occ_mat(i)
-            if count_neighbours(occ_mat,i) >= 4
-                updated_occ_mat(i) = 0;
-            end
-        else
-            if count_neighbours(occ_mat,i) == 0
-                updated_occ_mat(i) = 1;
+    if type_of == "direct"
+        for i = seat_idxs
+            if occ_mat(i)
+                if count_neighbours(occ_mat,i) >= 4
+                    updated_occ_mat(i) = 0;
+                end
+            else
+                if count_neighbours(occ_mat,i) == 0
+                    updated_occ_mat(i) = 1;
+                end
             end
         end
-    end
+    elseif type_of == "sight"
+        for i = seat_idxs
+            if occ_mat(i)
+                if count_neighbours_sight(occ_mat,i) >= 5
+                    updated_occ_mat(i) = 0;
+                end
+            else
+                if count_neighbours_sight(occ_mat,i) == 0
+                    updated_occ_mat(i) = 1;
+                end
+            end
+        end
+        
 end
 
     
@@ -330,6 +344,31 @@ n = sum(mat(ys,xs),'all')-mat(i);
 end
 
 
+%puzzle 11.2
+%Basically identical to 11.1, but counting neighbours is a bit more
+%complicated
+
+function res = fun_11_2(seating)
+    seat_matrix = seating == 'L';
+    seat_idxs = find(seat_matrix)';
+    occupation_matrix = zeros(size(seat_matrix));
+    earlier_occupation_matrix = ones(size(seat_matrix));
+    n_updates = 0;
+    while any(occupation_matrix ~= earlier_occupation_matrix,'all')
+        earlier_occupation_matrix = occupation_matrix;
+        occupation_matrix = update_occ_matrix(occupation_matrix, seat_idxs, "sight");
+        n_updates = n_updates + 1;
+    end
+    res = sum(occupation_matrix, 'all');
+    disp("We had "+n_updates+" update cycles.");
+end
 
 
-
+function n = count_neighbours_sight(mat, i)
+%disp("count "+i+"!");
+sz = size(mat);
+[y,x] = ind2sub(size(mat),i);
+xs = (max(1,x-1):min(x+1,sz(2)));
+ys = (max(1,y-1):min(y+1,sz(1)));
+n = sum(mat(ys,xs),'all')-mat(i);
+end

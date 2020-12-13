@@ -412,62 +412,86 @@ def mult(args):
     
 
 # puzzle 10
-inputfile = "input_10.txt"
-numbers = lines_from_txt(inputfile, form = "int")
-#add outlet and charging
-numbers.extend([0,max(numbers)+3])
+# inputfile = "input_10.txt"
+# numbers = lines_from_txt(inputfile, form = "int")
+# #add outlet and charging
+# numbers.extend([0,max(numbers)+3])
 
-# puzzle 10.1
-def sorted_diffs(numbers):
-    s = sorted(numbers)
-    diffs = np.diff(s)
-    return diffs
+# # puzzle 10.1
+# def sorted_diffs(numbers):
+#     s = sorted(numbers)
+#     diffs = np.diff(s)
+#     return diffs
 
-out = sorted_diffs(numbers)
-print(sum(out==1)*sum(out==3))
-
-
-#puzzle 10.2
-def find_poppable_idxs(numbers):
-    s = sorted(numbers)
-    diffs = np.diff(s)
-    pop_idxs = [0]*len(s)
-    for ix in range(1,len(s)):
-        if all(diffs[ix-1:ix+1] == 1):
-            pop_idxs[ix] = 1
-    return pop_idxs
+# out = sorted_diffs(numbers)
+# print(sum(out==1)*sum(out==3))
 
 
-def number_of_options(n):
-    n_all_options = sum((mathcomb(n,k) for k in range(n,-1,-1)))
-    n_invalid_options = invalid_options(n)
-    return(n_all_options-n_invalid_options)
+# #puzzle 10.2
+# def find_poppable_idxs(numbers):
+#     s = sorted(numbers)
+#     diffs = np.diff(s)
+#     pop_idxs = [0]*len(s)
+#     for ix in range(1,len(s)):
+#         if all(diffs[ix-1:ix+1] == 1):
+#             pop_idxs[ix] = 1
+#     return pop_idxs
 
 
-def invalid_options(l):
-    return sum(range(1,l-1))
-
-def find_mutable_sections(numbers):
-    idxs = find_poppable_idxs(numbers)
-    section_dict = dict()
-    i=0
-    while i < len(idxs):
-        if idxs[i]:
-            k=i;
-            n = 1
-            i+=1
-            while idxs[i]:
-                n+=1
-                i+=1
-            section_dict[k] = n
-        else:
-            i+=1
-    return section_dict
+# def number_of_options(n):
+#     n_all_options = sum((mathcomb(n,k) for k in range(n,-1,-1)))
+#     n_invalid_options = invalid_options(n)
+#     return(n_all_options-n_invalid_options)
 
 
+# def invalid_options(l):
+#     return sum(range(1,l-1))
 
-sec_dict = find_mutable_sections(numbers)
+# def find_mutable_sections(numbers):
+#     idxs = find_poppable_idxs(numbers)
+#     section_dict = dict()
+#     i=0
+#     while i < len(idxs):
+#         if idxs[i]:
+#             k=i;
+#             n = 1
+#             i+=1
+#             while idxs[i]:
+#                 n+=1
+#                 i+=1
+#             section_dict[k] = n
+#         else:
+#             i+=1
+#     return section_dict
 
-noo = [number_of_options(v) for v in sec_dict.values()]
 
-res = mult(noo)
+
+# sec_dict = find_mutable_sections(numbers)
+
+# noo = [number_of_options(v) for v in sec_dict.values()]
+
+# res = mult(noo)
+
+#puzzle 12
+from Ships import Ship
+inputfile = "input_12.txt"
+instructions = lines_from_txt(inputfile)
+starting_point = np.array([0,0]);
+
+#puzzle 12.1
+ship = Ship(instructions = instructions, start_position = starting_point)
+ship.run()
+print(ship.manhattan_dist_from_initial_position())
+
+#puzzle 12.2
+from Ships import Ship2
+relative_waypoint_pos = np.array([10,1])
+ship2 = Ship2(instructions = instructions,\
+              start_position = starting_point,\
+              waypoint_direction = relative_waypoint_pos)
+ship2.run()
+print(ship2.manhattan_dist_from_initial_position())
+
+
+
+
