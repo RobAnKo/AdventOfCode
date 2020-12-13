@@ -297,7 +297,7 @@ function res = fun_11_1(seating)
     n_updates = 0;
     while any(occupation_matrix ~= earlier_occupation_matrix,'all')
         earlier_occupation_matrix = occupation_matrix;
-        occupation_matrix = update_occ_matrix(occupation_matrix, seat_idxs, "sight");
+        occupation_matrix = update_occ_matrix(occupation_matrix, seat_idxs, "direct");
         n_updates = n_updates + 1;
     end
     res = sum(occupation_matrix, 'all');
@@ -319,17 +319,20 @@ function updated_occ_mat = update_occ_matrix(occ_mat, seat_idxs, type_of)
             end
         end
     elseif type_of == "sight"
+        seat_mat = zeros(size(occ_mat));
+        seat_mat(seat_idxs) = 1;
         for i = seat_idxs
             if occ_mat(i)
-                if count_neighbours_sight(occ_mat,i) >= 5
+                if count_neighbours_sight(occ_mat,seat_mat,i) >= 5
                     updated_occ_mat(i) = 0;
                 end
             else
-                if count_neighbours_sight(occ_mat,i) == 0
+                if count_neighbours_sight(occ_mat,seat_mat,i) == 0
                     updated_occ_mat(i) = 1;
                 end
             end
         end
+    end
         
 end
 
@@ -364,11 +367,31 @@ function res = fun_11_2(seating)
 end
 
 
-function n = count_neighbours_sight(mat, i)
+function n = count_neighbours_sight(occ_mat, seat_mat, i)
 %disp("count "+i+"!");
-sz = size(mat);
-[y,x] = ind2sub(size(mat),i);
-xs = (max(1,x-1):min(x+1,sz(2)));
-ys = (max(1,y-1):min(y+1,sz(1)));
-n = sum(mat(ys,xs),'all')-mat(i);
+n = 0;
+sz = size(occ_mat);
+[y,x] = ind2sub(sz,i);
+directions = {[1 0],[0 1],[-1 0],[0 -1],[1 1],[-1 -1],[1 -1],[-1 1]};
+for direction = directions
+    n = n + sight(occ_mat, seat_mat, direction{:}, [y x], sz);
+end
+end
+
+function sighted = sight(occ_mat, seat_mat, direction, pos, mat_size)
+    sighted = 0;
+    found = 0;
+    test_pos = pos + direction;
+    while all(test_pos <= mat_size) && all(test_pos > [0,0]) && ~found
+        if seat_mat(test_pos(1),test_pos(2))
+            if occ_mat(test_pos(1),test_pos(2))
+                sighted = 1;
+                found = 1;
+            else
+                sighted = 0;
+                found = 1;
+            end
+        end
+        test_pos = test_pos + direction;
+    end
 end
