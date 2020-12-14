@@ -557,43 +557,17 @@ inputfile = "input_14.txt"
 mask_instructions = lines_from_txt(inputfile)
 mask_size = 36
 
-def apply_instructions(mask_instructions, mask_size):
-    mem = dict()
-    mask_idxs = [idx for idx,l in enumerate(mask_instructions) if l.startswith("mask")]
-    
-    for mi, next_mi in zip(mask_idxs, mask_idxs[1:] + [None]):
-        mask = mask_instructions[mi].split(" = ")[1]
-        idxs = [int(re.search("(\d+)", instr).group()) for instr in mask_instructions[mi+1:next_mi]]
-        write_values_unpadded = [np.base_repr(number = int(instr.split(" = ")[-1]),\
-                                              base = 2,\
-                                              padding = 0)\
-                                 for instr in mask_instructions[mi+1:next_mi]]
-        write_values_padded = [pad_str(val,mask_size) for val in write_values_unpadded]
-        masked_write_values = [apply_mask(v,mask) for v in write_values_padded]
-        translated_write_values = [int(val,2) for val in masked_write_values]
-    
-        for i,v in zip(idxs,translated_write_values):
-            mem[i] = v
-    
-    return sum(mem.values())
+from BitmaskSystem import BitmaskSystem
 
+bmsys = BitmaskSystem(mask_instructions,mask_size)
 
-def apply_mask(val, mask):
-    val_l = list(val)
-    mask_l = list(mask)
-    for i in range(len(val_l)):
-        if mask_l[i] == "1":
-            val_l[i] = "1"
-        elif mask_l[i] == "0":
-            val_l[i] =  "0"
-    return "".join(val_l)
-        
+# puzzle 14.1
+bmsys.run1()
+print(bmsys.memory_sum())
 
-def pad_str(string, length):
-    padding = "".join(["0"] *(length-len(string)))
-    return padding+string
-
-out = apply_instructions(mask_instructions, mask_size)
-
+# puzzle 14.2
+bmsys.memory_reset()
+bmsys.run2()
+print(bmsys.memory_sum())
 
 
