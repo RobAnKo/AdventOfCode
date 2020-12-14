@@ -473,25 +473,127 @@ def mult(args):
 # res = mult(noo)
 
 #puzzle 12
-from Ships import Ship
-inputfile = "input_12.txt"
-instructions = lines_from_txt(inputfile)
-starting_point = np.array([0,0]);
+# from Ships import Ship
+# inputfile = "input_12.txt"
+# instructions = lines_from_txt(inputfile)
+# starting_point = np.array([0,0]);
 
-#puzzle 12.1
-ship = Ship(instructions = instructions, start_position = starting_point)
-ship.run()
-print(ship.manhattan_dist_from_initial_position())
+# #puzzle 12.1
+# ship = Ship(instructions = instructions, start_position = starting_point)
+# ship.run()
+# print(ship.manhattan_dist_from_initial_position())
 
-#puzzle 12.2
-from Ships import Ship2
-relative_waypoint_pos = np.array([10,1])
-ship2 = Ship2(instructions = instructions,\
-              start_position = starting_point,\
-              waypoint_direction = relative_waypoint_pos)
-ship2.run()
-print(ship2.manhattan_dist_from_initial_position())
+# #puzzle 12.2
+# from Ships import Ship2
+# relative_waypoint_pos = np.array([10,1])
+# ship2 = Ship2(instructions = instructions,\
+#               start_position = starting_point,\
+#               waypoint_direction = relative_waypoint_pos)
+# ship2.run()
+# print(ship2.manhattan_dist_from_initial_position())
 
+
+# puzzle 13
+
+# inputfile = "input_13.txt"
+# depart_time_and_busses = lines_from_txt(inputfile)
+
+# # puzzle 13.1
+# def find_closest_bus(input_info):
+#     depart_t = int(input_info[0]);
+#     busses = [int(x) for x in re.findall("(\d+)", input_info[1])]
+#     hit = 0
+#     t = depart_t
+#     while not hit:
+#         t += 1
+#         resids = [t % x for x in busses]
+#         if 0 in resids:
+#             hit = 1
+#             for i,r in enumerate(resids):
+#                 if not r:
+#                     bus_of_choice = busses[i]
+#     return bus_of_choice*(t-depart_t)
+
+# print(find_closest_bus(depart_time_and_busses))
+
+
+# puzzle 13.2
+
+# def find_timestamp(input_info):
+#     #extract busses
+#     busses = input_info[1].split(',')
+#     #extract valid busses from busses
+#     valid_busses = [int(valid_bus) for valid_bus in list(filter(lambda bus: bus != 'x', busses))]
+#     #extract time differences needed between busses
+#     bus_idxs = [idx if re.match("\d+", bus) else None for idx,bus in enumerate(busses)]
+#     time_diffs = list(filter(lambda x: x != None, bus_idxs))
+#     t = 0
+#     step = valid_busses[0]
+#     for i in range(1,len(valid_busses)):
+#         next_bus = valid_busses[i]
+#         t, step = find_time(t,step, next_bus, time_diffs[i])
+#         n1 = t
+#     return t
+    
+    
+
+
+# def find_time(start_time, step, next_bus, offset):
+#     found = 0
+#     i= 0
+#     while not found:
+#         t = start_time + step*i
+#         if not (t+offset) % next_bus:
+#             found = 1
+#         else:
+#             i+=1
+#     return t, step*next_bus
+
+# print(find_timestamp(depart_time_and_busses))
+
+
+# puzzle 14
+inputfile = "input_14.txt"
+mask_instructions = lines_from_txt(inputfile)
+mask_size = 36
+
+def apply_instructions(mask_instructions, mask_size):
+    mem = dict()
+    mask_idxs = [idx for idx,l in enumerate(mask_instructions) if l.startswith("mask")]
+    
+    for mi, next_mi in zip(mask_idxs, mask_idxs[1:] + [None]):
+        mask = mask_instructions[mi].split(" = ")[1]
+        idxs = [int(re.search("(\d+)", instr).group()) for instr in mask_instructions[mi+1:next_mi]]
+        write_values_unpadded = [np.base_repr(number = int(instr.split(" = ")[-1]),\
+                                              base = 2,\
+                                              padding = 0)\
+                                 for instr in mask_instructions[mi+1:next_mi]]
+        write_values_padded = [pad_str(val,mask_size) for val in write_values_unpadded]
+        masked_write_values = [apply_mask(v,mask) for v in write_values_padded]
+        translated_write_values = [int(val,2) for val in masked_write_values]
+    
+        for i,v in zip(idxs,translated_write_values):
+            mem[i] = v
+    
+    return sum(mem.values())
+
+
+def apply_mask(val, mask):
+    val_l = list(val)
+    mask_l = list(mask)
+    for i in range(len(val_l)):
+        if mask_l[i] == "1":
+            val_l[i] = "1"
+        elif mask_l[i] == "0":
+            val_l[i] =  "0"
+    return "".join(val_l)
+        
+
+def pad_str(string, length):
+    padding = "".join(["0"] *(length-len(string)))
+    return padding+string
+
+out = apply_instructions(mask_instructions, mask_size)
 
 
 
