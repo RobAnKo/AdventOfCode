@@ -22,8 +22,8 @@ import copy
 import time
 #from math import comb as mathcomb
 from functools import reduce
-#os.chdir("/home/robinkoch/Documents/AdventOfCode/AoC20")
-os.chdir("/home/karlchen/Documents/AdventOfCode/AoC20")
+os.chdir("/home/robinkoch/Documents/AdventOfCode/AoC20")
+#os.chdir("/home/karlchen/Documents/AdventOfCode/AoC20")
 
 
 
@@ -553,31 +553,52 @@ def mult(args):
 
 
 # puzzle 14
-inputfile = "input_14.txt"
-mask_instructions = lines_from_txt(inputfile)
-mask_size = 36
+# inputfile = "input_14.txt"
+# mask_instructions = lines_from_txt(inputfile)
+# mask_size = 36
 
-from BitmaskSystem import BitmaskSystem
+# from BitmaskSystem import BitmaskSystem
 
-bmsys = BitmaskSystem(mask_instructions,mask_size)
+# bmsys = BitmaskSystem(mask_instructions,mask_size)
 
-# puzzle 14.1
-bmsys.run1()
-print(bmsys.memory_sum())
+# # puzzle 14.1
+# bmsys.run1()
+# print(bmsys.memory_sum())
 
-# puzzle 14.2
-bmsys.memory_reset()
-bmsys.run2()
-print(bmsys.memory_sum())
+# # puzzle 14.2
+# bmsys.memory_reset()
+# bmsys.run2()
+# print(bmsys.memory_sum())
 
 # puzzle 15
 
-inputfile = "input_15_test.txt"
+inputfile = "input_15.txt"
 start_numbers = [int(x) for x in lines_from_txt(inputfile)[0].split(",")]
-
-
+n = 30000000
+# puzzle 15.1
 from MemoryGame import MemoryGame
 
+tic = time.perf_counter()
 mg = MemoryGame(start_numbers)
-mg.run()
-print(mg.round_dict[2019])
+mg.run(n)
+res1 = mg.last_spoken
+toc = time.perf_counter()
+print("Time for first MemoryGame version: "+ str(toc-tic))
+
+# puzzle 15.2
+from MemoryGame import MemoryGameEfficient
+tic2 = time.perf_counter()
+mg2 = MemoryGameEfficient(start_numbers)
+mg2.run(n)
+res2 = mg2.last_spoken
+toc2 = time.perf_counter()
+print("Time for second MemoryGame version: "+ str(toc2-tic2))
+
+
+from MemoryGame import MemoryGameBare
+tic3 = time.perf_counter()
+mg3 = MemoryGameBare(start_numbers)
+mg3.run(n)
+res3 = mg3.last_spoken
+toc3 = time.perf_counter()
+print("Time for third MemoryGame version: "+ str(toc3-tic3))
