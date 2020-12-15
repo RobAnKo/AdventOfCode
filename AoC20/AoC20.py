@@ -20,10 +20,10 @@ from scipy import signal
 from datetime import datetime
 import copy
 import time
-from math import comb as mathcomb
+#from math import comb as mathcomb
 from functools import reduce
-os.chdir("/home/robinkoch/Documents/AdventOfCode/AoC20")
-#os.chdir("/home/karlchen/Documents/AdventOfCode/AoC20")
+#os.chdir("/home/robinkoch/Documents/AdventOfCode/AoC20")
+os.chdir("/home/karlchen/Documents/AdventOfCode/AoC20")
 
 
 
@@ -570,4 +570,14 @@ bmsys.memory_reset()
 bmsys.run2()
 print(bmsys.memory_sum())
 
+# puzzle 15
 
+inputfile = "input_15_test.txt"
+start_numbers = [int(x) for x in lines_from_txt(inputfile)[0].split(",")]
+
+
+from MemoryGame import MemoryGame
+
+mg = MemoryGame(start_numbers)
+mg.run()
+print(mg.round_dict[2019])
