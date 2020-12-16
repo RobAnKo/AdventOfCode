@@ -572,33 +572,43 @@ def mult(args):
 
 # puzzle 15
 
-inputfile = "input_15.txt"
-start_numbers = [int(x) for x in lines_from_txt(inputfile)[0].split(",")]
-n = 30000000
-# puzzle 15.1
-from MemoryGame import MemoryGame
+# inputfile = "input_15.txt"
+# start_numbers = [int(x) for x in lines_from_txt(inputfile)[0].split(",")]
+# n = 30000000
+# # puzzle 15.1
+# from MemoryGame import MemoryGame
 
-tic = time.perf_counter()
-mg = MemoryGame(start_numbers)
-mg.run(n)
-res1 = mg.last_spoken
-toc = time.perf_counter()
-print("Time for first MemoryGame version: "+ str(toc-tic))
+# tic = time.perf_counter()
+# mg = MemoryGame(start_numbers)
+# mg.run(n)
+# res1 = mg.last_spoken
+# toc = time.perf_counter()
+# print("Time for first MemoryGame version: "+ str(toc-tic))
 
-# puzzle 15.2
-from MemoryGame import MemoryGameEfficient
-tic2 = time.perf_counter()
-mg2 = MemoryGameEfficient(start_numbers)
-mg2.run(n)
-res2 = mg2.last_spoken
-toc2 = time.perf_counter()
-print("Time for second MemoryGame version: "+ str(toc2-tic2))
+# # puzzle 15.2
+# from MemoryGame import MemoryGameEfficient
+# tic2 = time.perf_counter()
+# mg2 = MemoryGameEfficient(start_numbers)
+# mg2.run(n)
+# res2 = mg2.last_spoken
+# toc2 = time.perf_counter()
+# print("Time for second MemoryGame version: "+ str(toc2-tic2))
 
 
-from MemoryGame import MemoryGameBare
-tic3 = time.perf_counter()
-mg3 = MemoryGameBare(start_numbers)
-mg3.run(n)
-res3 = mg3.last_spoken
-toc3 = time.perf_counter()
-print("Time for third MemoryGame version: "+ str(toc3-tic3))
+# from MemoryGame import MemoryGameBare
+# tic3 = time.perf_counter()
+# mg3 = MemoryGameBare(start_numbers)
+# mg3.run(n)
+# res3 = mg3.last_spoken
+# toc3 = time.perf_counter()
+# print("Time for third MemoryGame version: "+ str(toc3-tic3))
+
+
+# puzzle 16
+inputfile = "input_16.txt"
+rules_and_tickets = lines_from_txt(inputfile)
+
+from TicketChecker import TicketChecker
+
+tc = TicketChecker(rules_and_tickets)
+res = tc.check_tickets()
