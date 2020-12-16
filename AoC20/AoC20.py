@@ -610,5 +610,12 @@ rules_and_tickets = lines_from_txt(inputfile)
 
 from TicketChecker import TicketChecker
 
+
 tc = TicketChecker(rules_and_tickets)
-res = tc.check_tickets()
+
+# puzzle 16.1
+print(tc.check_tickets())
+
+# puzzle 16.2
+#tc.filter_valid_tickets()
+print(tc.multiplied_departure_fields())
