@@ -23,7 +23,8 @@ import copy
 import time
 #from math import comb as mathcomb
 from functools import reduce
-os.chdir("/home/karlchen/Documents/AdventOfCode/AoC21")
+#os.chdir("/home/karlchen/Documents/AdventOfCode/AoC21")
+os.chdir("/home/robinkoch/Documents/AdventOfCode/AoC21")
 
 
 
@@ -49,7 +50,7 @@ def mult(args):
         prod *=a
     return prod
 
-
+'''
 
 # puzzle 1.1
 print("Puzzle 1")
@@ -229,11 +230,115 @@ def draw_map(lines, typ="straight"):
     
 
 vent_lines = read_vent_lines(inputfile)
-#4.1
+#5.1
 ventmap = draw_map(vent_lines, typ="straight")
 res = np.sum(ventmap>1)
 print(f"The solution is {res}")
-#4.2
+#5.2
 ventmap = draw_map(vent_lines, typ="all")
 res = np.sum(ventmap>1)
 print(f"The solution is {res}")
+
+
+#Puzzle 6
+print("Puzzle 6")
+inputfile = "input_6_test.txt"
+
+from Lanternfish import Lanternfish_brute
+L = Lanternfish_brute(inputfile)
+n = 80
+L.run(n)
+print(f"There are {L.n_fish} lanternfish after {n} days.")
+
+from Lanternfish import Lanternfish_smart
+L = Lanternfish_smart(inputfile)
+n = 256
+L.run(n)
+print(f"There are {L.n_fish} lanternfish after {n} days.")
+'''
+
+
+#Puzzle 7
+print("Puzzle 7")
+inputfile = "input_7.txt"
+
+# with open(inputfile, "r") as f:
+#     positions = [int(x) for x  in f.read().strip().split(",")]
+
+# med = int(np.median(positions))
+# fuel = sum([abs(p-med) for p in positions])
+# print(f"The crabs need {fuel} fuel to get to position {med}.")
+
+# from CrabSubmarine import FuelOptimizer
+
+# fo = FuelOptimizer(inputfile)
+# fo.find_min_fuel()
+# print(f"The crabs need {fo.min_fuel} fuel to get to position {fo.best_position}")
+
+
+print("Puzzle 8")
+inputfile = "input_8.txt"
+
+lines = lines_from_txt(inputfile)
+inputs = [line.split("|")[0].strip().split(" ") for line in lines]
+outputs = [line.split("|")[1].strip().split(" ") for line in lines]
+
+unique_lengths = [2,3,4,7]
+res = sum([len(op) in unique_lengths for ops in outputs for op in ops])
+
+print(f"There are {res} unique lengths.")
+
+from SSD import Decoder
+
+res = sum([Decoder(line).calculate_output() for line in lines])
+print(f"The result is {res}.")
+
+
+print("Puzzle 9")
+inputfile = "input_9.txt"
+x = np.fromfile(inputfile)
+x = lines_from_txt(inputfile)
+nrows = len(x)
+ncols = len(x[0])
+arr = np.empty([ncols, nrows], dtype="int")
+
+for r in range(nrows):
+    row = [int(n) for n in list(x[r])]
+    arr[:,r] = row
+
+def is_lowpoint(arr,x,y):
+    sz = arr.shape
+    val = arr[x,y]
+    neighbours = []
+    if x > 0:
+        neighbours.append(arr[x-1,y])
+    if y > 0:
+        neighbours.append(arr[x,y-1])
+    if x < sz[0]-1:
+        neighbours.append(arr[x+1,y])
+    if y < sz[1]-1:
+        neighbours.append(arr[x,y+1])
+    
+    if np.all([val < n for n in neighbours]):
+        return True 
+    else:
+        return False
+
+lowpoints = np.empty(arr.shape, dtype="bool")
+for y in range(nrows):
+    for x in range(ncols):
+        lowpoints[x,y] = is_lowpoint(arr,x,y)
+
+score = sum(arr[lowpoints] +1)
+print(f"The number of basins is {np.sum(lowpoints)}, the total risk score is {score}.")
+
+
+from skimage import measure
+basins = arr != 9
+
+all_labels = measure.label(basins, connectivity = 1)
+props = measure.regionprops(all_labels)
+areas = [prop.area for prop in props]
+res = mult(sorted(areas, reverse=True)[0:3])
+
+print(f"The product of the three largest basins is {res}.")
