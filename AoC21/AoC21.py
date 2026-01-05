@@ -23,8 +23,8 @@ import copy
 import time
 #from math import comb as mathcomb
 from functools import reduce
-#os.chdir("/home/karlchen/Documents/AdventOfCode/AoC21")
-os.chdir("/home/robinkoch/Documents/AdventOfCode/AoC21")
+os.chdir("/home/karlchen/Documents/AdventOfCode/AoC21")
+#os.chdir("/home/robinkoch/Documents/AdventOfCode/AoC21")
 
 
 
@@ -255,7 +255,7 @@ L = Lanternfish_smart(inputfile)
 n = 256
 L.run(n)
 print(f"There are {L.n_fish} lanternfish after {n} days.")
-'''
+
 
 
 #Puzzle 7
@@ -342,3 +342,13 @@ areas = [prop.area for prop in props]
 res = mult(sorted(areas, reverse=True)[0:3])
 
 print(f"The product of the three largest basins is {res}.")
+'''
+print("Puzzle 10")
+inputfile = "input_10_test.txt"
+lines = lines_from_txt(inputfile)
+from SyntaxChecker import SyntaxChecker
+
+sc = [SyntaxChecker(line) for line in lines]
+complete = [s.is_complete for s in sc]
+#in the test data, lines[2,4,5,7 and 8] are corrupt, the others are incomplete
+
