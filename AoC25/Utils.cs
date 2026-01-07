@@ -108,4 +108,22 @@ class Utils
     {
         return referenceRange.Item2 - referenceRange.Item1 + 1;
     }
+
+    internal Int128 Calculate(char symbol, List<Int128> operands)
+    {
+        Int128 output = symbol == '+' ? 0: 1;
+
+        foreach (Int128 o in operands)
+        {
+            if (symbol == '+')
+            {
+                output += o;
+            }
+            else
+            {
+                output *= o;
+            }
+        }
+        return output;
+    }
 }

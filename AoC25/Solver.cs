@@ -393,61 +393,75 @@ public class Solver
         return output;
     }
 
-    private int Solve6_2()
+    private Int128 Solve6_2()
     {
-        int output = 0;
-        int[,] floor = _fileReader.MatrixFromLines(_inputFilePath);
+        Int128 output = 0;
+        char[,] sheet = _fileReader.CharMatrixFromLines(_inputFilePath);
 
-        int[,] floorChanges;
-
-        _utils.PrintMatrix(floor);          
-
-        bool changed = true;
-
-        while (changed)
-        {
-            floorChanges = new int[floor.GetLength(0), floor.GetLength(1)];
-
-            changed = false;
-
-            for (int xPos = 0; xPos < floor.GetLength(0); xPos++)
+        List<Int128> operands = new();
+        //go from upper right downwards until end up lower left
+        for (int xPos = sheet.GetLength(1) - 1; xPos >= 0 ; xPos--)
+        {   
+            string intermediateString = "";
+            bool calculate = false;
+            char symbol = ' ';
+            ///down
+            for (int yPos = 0; yPos < sheet.GetLength(0); yPos++)
             {
-                for (int yPos = 0; yPos < floor.GetLength(1); yPos++)
+                symbol = sheet[yPos,xPos];
+                if (symbol == ' ') continue;
+                else if (symbol == '+' || symbol == '*')
                 {
-                    if (floor[xPos, yPos] == 1 && _utils.CountOnesAroundPosition(floor, xPos, yPos) < 4)
-                    {
-                        output++;
-                        floorChanges[xPos, yPos] = 1;
-                        changed = true;
-                    }
+                    calculate = true;
+                }
+                else
+                {
+                    intermediateString += symbol;
                 }
             }
-            floor =_utils.MatrixSubtract(floor, floorChanges);
-            _utils.PrintMatrix(floor);
+            if (intermediateString == "")
+            {
+                continue;
+            }
+            else
+            {
+                operands.Add(Int128.Parse(intermediateString));
+            }
+            
+            if (calculate)
+            {
+                output += _utils.Calculate(symbol, operands);
+                operands = new();
+            }
         }
-
-        
-
         return output;
     }
 
     private int Solve7_1()
     {
         int output = 0;
-        int[,] floor = _fileReader.MatrixFromLines(_inputFilePath);
+        int sourceIdx = _fileReader.StringsFromLines(_inputFilePath)[0].IndexOf('S');
+        int[,] splitterMap = _fileReader.MatrixFromLines(_inputFilePath, '^', '.');
 
-        for (int xPos = 0; xPos < floor.GetLength(0); xPos++)
+        HashSet<int> currentBeams = new(){sourceIdx};
+
+        for (int level = 0; level < splitterMap.GetLength(1); level++)
         {
-            for (int yPos = 0; yPos < floor.GetLength(1); yPos++)
+            HashSet<int> newBeams = new();
+            foreach (int xIdx in currentBeams)
             {
-                if (floor[xPos, yPos] == 1 && _utils.CountOnesAroundPosition(floor, xPos, yPos) < 4)
+                if (splitterMap[xIdx, level] == 1)
                 {
                     output++;
+                    newBeams.UnionWith([xIdx-1, xIdx+1]);
                 }
+                else newBeams.Add(xIdx);
             }
+            currentBeams = newBeams;
         }
         return output;
     }
+
 
     private int Solve7_2()
     {

@@ -35,7 +35,7 @@ public int[,] MatrixFromLines(string inputFile, char one = '@', char zero = '.')
         {
             for(int y = 0; y < height; y++)
             {
-                output[x,y] = lines[x][y] == one ? 1 : 0;
+                output[x,y] = lines[y][x] == one ? 1 : 0;
             }
         }
         return output;
@@ -119,6 +119,31 @@ public string[,] ArrayFromSpaceSeparated(string inputFilePath)
 
         }
 
+        return output;
+    }
+
+    internal char[,] CharMatrixFromLines(string inputFilePath)
+    {
+        string[] lines = StringsFromLines(inputFilePath);
+        int height = lines.Length;
+        int width = lines[0].Length;
+
+        char[,] output = new char[height, width];
+
+        int yIdx = 0;
+
+        foreach (string line in lines)
+        {
+            int xIdx = 0;
+
+            foreach (char symbol in line)
+            {
+                output[yIdx, xIdx] = symbol;
+                xIdx++;
+            }
+            yIdx++;
+
+        }
         return output;
     }
 }
