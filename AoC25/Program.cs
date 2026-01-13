@@ -1,4 +1,4 @@
-using AoC;
+using AoC25;
 
 
 System.Console.WriteLine("Which day should we solve?");

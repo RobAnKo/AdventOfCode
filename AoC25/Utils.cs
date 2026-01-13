@@ -1,4 +1,4 @@
-namespace AoC;
+namespace AoC25;
 
 
 class Utils 

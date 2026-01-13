@@ -1,20 +1,17 @@
-﻿using System.Collections;
-using FileReader;
+﻿using FileReader;
 
-namespace AoC;
+namespace AoC25;
 
 public class Solver
 {
+    private readonly bool _real;
+    private readonly string _dayNumber;
+    private readonly string _part;
+    private readonly string _basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", ".."));
+    private string _inputFilePath = "";
 
-
-    bool _real;
-    string _dayNumber;
-    string _part = "1";
-    string _basePath = "/home/karlchen/Documents/AdventOfCode/AoC25/";
-    string _inputFilePath = "";
-
-    Reader _fileReader;
-    Utils _utils;
+    readonly Reader _fileReader;
+    readonly Utils _utils;
 
     public Solver(bool real, string dayNumber, string part)
     {
@@ -118,9 +115,8 @@ public class Solver
         foreach (string move in moves)
         {
             int clicks = Int32.Parse(move.Substring(1));
-            int distance;
-
-            distance = move.StartsWith("R") ? 100 - position : position;
+            int distance = move.StartsWith("R") ? 100 - position : position;
+            
             if (distance == 0)
                 distance = position = 100;
 
@@ -186,13 +182,13 @@ public class Solver
                 int[] plausibleLengths = _utils.IntegerDivisors(numberLength);
 
 
-                ///iterate over plausible sequence lengths
+                //iterate over plausible sequence lengths
                 foreach (int leadLength in plausibleLengths)
                 {
                     string leadSequence = number.Substring(0, leadLength);
                     bool hit = true;
 
-                    ///iterate over chunks of length
+                    //iterate over chunks of length
                     for (int startIndex = leadLength; startIndex + leadLength <= numberLength; startIndex += leadLength)
                     {
                         string compareSequence = number.Substring(startIndex, leadLength);
@@ -203,7 +199,7 @@ public class Solver
                         }
                     }
 
-                    ///only invalid if all chunks are repetitions of the lead sequence
+                    //only invalid if all chunks are repetitions of the lead sequence
                     if (hit)
                     {
                         output += startNumber;
@@ -276,15 +272,13 @@ public class Solver
         int output = 0;
         int[,] floor = _fileReader.MatrixFromLines(_inputFilePath);
 
-        int[,] floorChanges;
-
         _utils.PrintMatrix(floor);          
 
         bool changed = true;
 
         while (changed)
         {
-            floorChanges = new int[floor.GetLength(0), floor.GetLength(1)];
+            int[,] floorChanges = new int[floor.GetLength(0), floor.GetLength(1)];
 
             changed = false;
 
@@ -316,14 +310,14 @@ public class Solver
         ((Int128, Int128)[], Int128[]) rangesAndIDs = _fileReader.ArrayListFromSplitLines(_inputFilePath);
 
         (Int128, Int128)[] ranges = rangesAndIDs.Item1;
-        Int128[] IDs = rangesAndIDs.Item2;
+        Int128[] ids = rangesAndIDs.Item2;
 
 
-        foreach (Int128 ID in IDs)
+        foreach (Int128 id in ids)
         {
             foreach((Int128, Int128) range in ranges)
             {
-                if (ID >= range.Item1 && ID <= range.Item2) 
+                if (id >= range.Item1 && id <= range.Item2) 
                 {
                     output++;
                     break;
@@ -345,17 +339,18 @@ public class Solver
 
         foreach ((Int128, Int128) compareRange in ranges.Skip(1))
         {
-            ///Containment
+            //Containment
             if (!(compareRange.Item2 > referenceRange.Item2))
             {
                 continue;
             }
-            ///Extension -> update upper boundary of reference range
-            else if (!(compareRange.Item1 > referenceRange.Item2 + 1))
+            //Extension -> update upper boundary of reference range
+
+            if (!(compareRange.Item1 > referenceRange.Item2 + 1))
             {
                 referenceRange.Item2 = compareRange.Item2;
             }
-            ///Exclusive -> change reference to new range and add former reference to output
+            //Exclusive -> change reference to new range and add former reference to output
             else
             {
                 output += _utils.InclusiveRangeLength(referenceRange);
@@ -375,20 +370,20 @@ public class Solver
 
         for (int xPos = 0; xPos < sheet.GetLength(1); xPos++)
         {
-            Int128 intermediate_output = 0;
+            Int128 intermediateOutput = 0;
             string operation = "";
             for (int yPos = sheet.GetLength(0) - 1; yPos >= 0; yPos--)
             {
                 if (yPos == sheet.GetLength(0) - 1)
                 {
                     operation = sheet[yPos, xPos];
-                    intermediate_output = (operation == "+") ? 0 : 1;
+                    intermediateOutput = (operation == "+") ? 0 : 1;
                 }
-                else if (operation == "+") intermediate_output += Int128.Parse(sheet[yPos, xPos]);
-                else if (operation == "*") intermediate_output *= Int128.Parse(sheet[yPos, xPos]);
+                else if (operation == "+") intermediateOutput += Int128.Parse(sheet[yPos, xPos]);
+                else if (operation == "*") intermediateOutput *= Int128.Parse(sheet[yPos, xPos]);
                     
             }
-            output += intermediate_output;
+            output += intermediateOutput;
         }    
         return output;
     }
@@ -405,18 +400,21 @@ public class Solver
             string intermediateString = "";
             bool calculate = false;
             char symbol = ' ';
-            ///down
+            //down
             for (int yPos = 0; yPos < sheet.GetLength(0); yPos++)
             {
                 symbol = sheet[yPos,xPos];
-                if (symbol == ' ') continue;
-                else if (symbol == '+' || symbol == '*')
+                switch (symbol)
                 {
-                    calculate = true;
-                }
-                else
-                {
-                    intermediateString += symbol;
+                    case ' ':
+                        continue;
+                    case '+':
+                    case '*':
+                        calculate = true;
+                        break;
+                    default:
+                        intermediateString += symbol;
+                        break;
                 }
             }
             if (intermediateString == "")
@@ -441,13 +439,13 @@ public class Solver
     {
         int output = 0;
         int sourceIdx = _fileReader.StringsFromLines(_inputFilePath)[0].IndexOf('S');
-        int[,] splitterMap = _fileReader.MatrixFromLines(_inputFilePath, '^', '.');
+        int[,] splitterMap = _fileReader.MatrixFromLines(_inputFilePath, '^');
 
-        HashSet<int> currentBeams = new(){sourceIdx};
+        HashSet<int> currentBeams = [sourceIdx];
 
         for (int level = 0; level < splitterMap.GetLength(1); level++)
         {
-            HashSet<int> newBeams = new();
+            HashSet<int> newBeams = [];
             foreach (int xIdx in currentBeams)
             {
                 if (splitterMap[xIdx, level] == 1)
@@ -463,40 +461,44 @@ public class Solver
     }
 
 
-    private int Solve7_2()
+    private Int128 Solve7_2()
     {
-        int output = 0;
-        int[,] floor = _fileReader.MatrixFromLines(_inputFilePath);
+        int sourceIdx = _fileReader.StringsFromLines(_inputFilePath)[0].IndexOf('S');
+        int[,] splitterMap = _fileReader.MatrixFromLines(_inputFilePath, '^');
+        int height = splitterMap.GetLength(1);
+        int width = splitterMap.GetLength(0);
 
-        int[,] floorChanges;
-
-        _utils.PrintMatrix(floor);          
-
-        bool changed = true;
-
-        while (changed)
+        Int128[] currentBeams = new Int128[width];
+        currentBeams[sourceIdx] = 1;
+        Console.WriteLine(string.Join(" ", currentBeams));
+        for (int level = 0; level < height; level++)
         {
-            floorChanges = new int[floor.GetLength(0), floor.GetLength(1)];
-
-            changed = false;
-
-            for (int xPos = 0; xPos < floor.GetLength(0); xPos++)
+            
+            Int128[] newBeams = new Int128[width];
+            for (int xIdx = 0; xIdx < width; xIdx++)
             {
-                for (int yPos = 0; yPos < floor.GetLength(1); yPos++)
+                if (currentBeams[xIdx] == 0) continue;
+                //splitter found
+                if (splitterMap[xIdx, level] != 0)
                 {
-                    if (floor[xPos, yPos] == 1 && _utils.CountOnesAroundPosition(floor, xPos, yPos) < 4)
-                    {
-                        output++;
-                        floorChanges[xPos, yPos] = 1;
-                        changed = true;
-                    }
+                    Int128 bundle = currentBeams[xIdx];
+                    newBeams[xIdx - 1] += bundle;
+                    newBeams[xIdx + 1] += bundle;
+                }
+                else
+                {
+                    newBeams[xIdx] += currentBeams[xIdx];
                 }
             }
-            floor =_utils.MatrixSubtract(floor, floorChanges);
-            _utils.PrintMatrix(floor);
+            currentBeams = newBeams;
+            Console.WriteLine(string.Join(" ", currentBeams));
         }
 
-        
+        Int128 output = 0;
+        foreach (Int128 i in currentBeams)
+        {
+            output+=i;
+        }
 
         return output;
     }
