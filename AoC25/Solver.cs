@@ -78,6 +78,20 @@ public class Solver
                     else
                         return Solve7_2();
                 }
+            case 8:
+            {
+                if (_part == "1")
+                    return Solve8_1();
+                else
+                    return Solve8_2();
+            }
+            case 9:
+            {
+                if (_part == "1")
+                    return Solve9_1();
+                else
+                    return Solve9_2();
+            }
             default:
                 return 0;
         }
@@ -503,5 +517,224 @@ public class Solver
         return output;
     }
 
+    private int Solve8_1()
+    {
+
+        int nConnections = _real ? 1000 : 10;
+        
+        int[][] coordinates = _fileReader.CoordinatesFromLines(_inputFilePath);
+
+
+        //distances
+        Dictionary<(int,int), double> distances = new();
+        
+        for (int i = 0; i < coordinates.Length-1; i++)
+        {
+            var coordinates1 = coordinates[i];
+            for (int j = i+1; j < coordinates.Length; j++)
+            {
+                var coordinates2 = coordinates[j];
+                distances[(i, j)] = _utils.EuclidianDistance(coordinates1, coordinates2);
+            }
+        }
+        
+        //sort by distance
+        var sortedPairs = distances.OrderBy(item => item.Value)
+            .Select(item => item.Key);
+
+
+
+        //clustering by distance
+        
+        Dictionary<int, HashSet<int>> clusterMemberDict = new();
+        Dictionary<int, int> nodeClusterDict = new();
+
+        int currentCluster = 0;
+
+        foreach (var keyPair in sortedPairs.Take(nConnections))
+        {
+            int one = keyPair.Item1;
+            int two = keyPair.Item2;
+
+            int oneCluster = nodeClusterDict.GetValueOrDefault(one, -1);
+            int twoCluster = nodeClusterDict.GetValueOrDefault(two, -1);
+
+            bool sameState = oneCluster == twoCluster;
+            bool clusteredYet = oneCluster > -1 && twoCluster > -1;
+
+            //same cluster or no cluster yet
+            if (sameState)
+            {
+                //new cluster with both nodes
+                if (!clusteredYet)
+                {
+                    clusterMemberDict[currentCluster] = new HashSet<int>([one, two]);
+                    nodeClusterDict[one] = currentCluster;
+                    nodeClusterDict[two] = currentCluster;
+                    currentCluster++;
+                }
+                //already in same cluster, do nothing
+                continue;
+            }
+
+            //different clusters
+            
+            //both clustered, need to merge
+            if (clusteredYet)
+            {
+                int targetCluster = nodeClusterDict[one];
+                int sourceCluster = nodeClusterDict[two];
+                foreach (int member in clusterMemberDict[sourceCluster])
+                {
+                    nodeClusterDict[member] = targetCluster;
+                }
+                clusterMemberDict[targetCluster].UnionWith(clusterMemberDict[sourceCluster]);
+                clusterMemberDict.Remove(sourceCluster);
+
+            }
+            //only one clustered, add the other to that cluster
+            else
+            {
+                if (oneCluster > -1)
+                {
+                    clusterMemberDict[oneCluster].Add(two);
+                    nodeClusterDict[two] = oneCluster;
+                }
+                else
+                {
+                    clusterMemberDict[twoCluster].Add(one);
+                    nodeClusterDict[one] = twoCluster;
+                }
+            }
+        }
+
+        //sort by size
+
+        //var sortedClusters = clusterMemberDict.OrderByDescending(cluster => cluster.Value.Count);
+        var sortedCounts = clusterMemberDict.Values.OrderByDescending(cluster => cluster.Count).Select(value => value.Count).ToArray();
+        
+        //calculate result
+
+        int output = 1;
+        int idx = 0;
+        while (idx < 3)
+        {
+            output *= sortedCounts[idx];
+            idx++;
+        }
+
+        return output;
+    }
+
+
+    private Int128 Solve8_2()
+    {
+        int[][] coordinates = _fileReader.CoordinatesFromLines(_inputFilePath);
+
+
+        //distances
+        Dictionary<(int, int), double> distances = new();
+
+        for (int i = 0; i < coordinates.Length - 1; i++)
+        {
+            var coordinates1 = coordinates[i];
+            for (int j = i + 1; j < coordinates.Length; j++)
+            {
+                var coordinates2 = coordinates[j];
+                distances[(i, j)] = _utils.EuclidianDistance(coordinates1, coordinates2);
+            }
+        }
+
+        //sort by distance
+        var sortedPairs = distances.OrderBy(item => item.Value)
+            .Select(item => item.Key);
+
+
+
+        //clustering by distance
+
+        Dictionary<int, HashSet<int>> clusterMemberDict = new();
+        Dictionary<int, int> nodeClusterDict = new();
+
+        int currentCluster = 0;
+
+        foreach (var keyPair in sortedPairs)
+        {
+            int one = keyPair.Item1;
+            int two = keyPair.Item2;
+
+            int oneCluster = nodeClusterDict.GetValueOrDefault(one, -1);
+            int twoCluster = nodeClusterDict.GetValueOrDefault(two, -1);
+
+            bool sameState = oneCluster == twoCluster;
+            bool clusteredYet = oneCluster > -1 && twoCluster > -1;
+
+            //same cluster or no cluster yet
+            if (sameState)
+            {
+                //new cluster with both nodes
+                if (!clusteredYet)
+                {
+                    clusterMemberDict[currentCluster] = new HashSet<int>([one, two]);
+                    nodeClusterDict[one] = currentCluster;
+                    nodeClusterDict[two] = currentCluster;
+                    currentCluster++;
+                }
+                //already in same cluster, do nothing
+                continue;
+            }
+
+            //different clusters
+
+            //both clustered, need to merge
+            if (clusteredYet)
+            {
+                int targetCluster = nodeClusterDict[one];
+                int sourceCluster = nodeClusterDict[two];
+                foreach (int member in clusterMemberDict[sourceCluster])
+                {
+                    nodeClusterDict[member] = targetCluster;
+                }
+                clusterMemberDict[targetCluster].UnionWith(clusterMemberDict[sourceCluster]);
+                clusterMemberDict.Remove(sourceCluster);
+
+            }
+            //only one clustered, add the other to that cluster
+            else
+            {
+                if (oneCluster > -1)
+                {
+                    clusterMemberDict[oneCluster].Add(two);
+                    nodeClusterDict[two] = oneCluster;
+                }
+                else
+                {
+                    clusterMemberDict[twoCluster].Add(one);
+                    nodeClusterDict[one] = twoCluster;
+                }
+            }
+
+            //stop if all nodes are in one cluster
+            if (nodeClusterDict.Count == coordinates.Length && clusterMemberDict.Count == 1)
+            {
+                return coordinates[one][0] * coordinates[two][0];
+            }
+        }
+
+        return default;
+    }
+
+    private int Solve9_1()
+    {
+        int output = 0;
+        return output;
+    }
+
+
+    private int Solve9_2()
+    {
+        int output = 0;
+        return output;
+    }
 
 }

@@ -5,13 +5,13 @@ namespace FileReader;
 
 public class Reader
 {
-public string[] StringsFromLines(string inputFile)
-{
-    return File.ReadAllLines(inputFile);
-}
+    public string[] StringsFromLines(string inputFile)
+    {
+        return File.ReadAllLines(inputFile);
+    }
 
-public List<(Int128, Int128)> RangesFromCommaSeparated(string inputFile)
-{
+    public List<(Int128, Int128)> RangesFromCommaSeparated(string inputFile)
+    {
     List<(Int128, Int128)> output = new();
     string[] boundaries = StringsFromCommaSeparated(inputFile);
 
@@ -21,9 +21,9 @@ public List<(Int128, Int128)> RangesFromCommaSeparated(string inputFile)
         output.Add((Int128.Parse(bds[0]),Int128.Parse(bds[1])));
     }
     return output;    
-}
+    }
 
-public int[,] MatrixFromLines(string inputFile, char one = '@', char zero = '.')
+    public int[,] MatrixFromLines(string inputFile, char one = '@', char zero = '.')
     {
         string[] lines = StringsFromLines(inputFile);
         int height = lines.Length;
@@ -44,20 +44,20 @@ public int[,] MatrixFromLines(string inputFile, char one = '@', char zero = '.')
 
 
 
-public List<int> NumbersFromLines(string inputFile)
-{
-    List<int> output = new();
-    return output;
-}
+    public List<int> NumbersFromLines(string inputFile)
+    {
+        List<int> output = new();
+        return output;
+    }
 
 
-private string[] StringsFromCommaSeparated(string inputFile)
-{
-    string line = File.ReadLines(inputFile).First();
-    return line.Split(',');
-}
+    private string[] StringsFromCommaSeparated(string inputFile)
+    {
+        string line = File.ReadLines(inputFile).First();
+        return line.Split(',');
+    }
 
-internal ((Int128, Int128)[], Int128[]) ArrayListFromSplitLines(string inputFilePath)
+    internal ((Int128, Int128)[], Int128[]) ArrayListFromSplitLines(string inputFilePath)
     {
         ((Int128, Int128)[], Int128[]) output = new();
         
@@ -95,7 +95,7 @@ internal ((Int128, Int128)[], Int128[]) ArrayListFromSplitLines(string inputFile
     }
 
 
-public string[,] ArrayFromSpaceSeparated(string inputFilePath)
+    public string[,] ArrayFromSpaceSeparated(string inputFilePath)
     {
         string[] lines = StringsFromLines(inputFilePath);
         int height = lines.Length;
@@ -146,4 +146,21 @@ public string[,] ArrayFromSpaceSeparated(string inputFilePath)
         }
         return output;
     }
+
+    internal int[][] CoordinatesFromLines(string inputFilePath)
+    {
+        List<int[]> coordinates = new();
+        string[] lines = StringsFromLines(inputFilePath);
+        foreach (string line in lines)
+        {
+            string[] parts = line.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            int x = int.Parse(parts[0]);
+            int y = int.Parse(parts[1]);
+            int z = int.Parse(parts[2]);
+            coordinates.Add([x,y,z]);
+        }
+        return coordinates.ToArray();
+    }
+
+
 }

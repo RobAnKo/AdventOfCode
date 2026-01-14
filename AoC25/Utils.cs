@@ -126,4 +126,15 @@ class Utils
         }
         return output;
     }
+
+    internal double EuclidianDistance(int[] a, int[] b)
+    {
+        double quadSum = 0;
+        for (int i = 0; i < a.Length; i++)
+        {
+            quadSum += Math.Pow(Math.Abs(a[i] - b[i]), 2);
+        }
+        return Math.Sqrt(quadSum);
+    }
+
 }
