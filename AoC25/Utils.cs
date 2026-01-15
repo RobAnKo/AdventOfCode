@@ -137,4 +137,14 @@ class Utils
         return Math.Sqrt(quadSum);
     }
 
+    public Int128 AreasFromCornerCoordinates(int[] coordinates1, int[] coordinates2)
+    {
+        Int128 product = 1;
+        for (int i = 0; i < coordinates1.Length; i++)
+        {
+            product *= Math.Abs(coordinates1[i] - coordinates2[i]) + 1;
+        }
+        return product;
+    }
+
 }

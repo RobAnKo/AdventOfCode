@@ -724,17 +724,110 @@ public class Solver
         return default;
     }
 
-    private int Solve9_1()
+    private Int128 Solve9_1()
     {
-        int output = 0;
-        return output;
+        int[][] coordinates = _fileReader.CoordinatesFromLines(_inputFilePath);
+
+        //areas
+        Dictionary<(int, int), Int128> areas = new();
+
+        for (int i = 0; i < coordinates.Length - 1; i++)
+        {
+            var coordinates1 = coordinates[i];
+            for (int j = i + 1; j < coordinates.Length; j++)
+            {
+                var coordinates2 = coordinates[j];
+                areas[(i, j)] = _utils.AreasFromCornerCoordinates(coordinates1, coordinates2);
+            }
+
+        }
+
+        return areas.Max(item => item.Value);
     }
 
 
     private int Solve9_2()
     {
-        int output = 0;
-        return output;
+        int[][] coordinates = _fileReader.CoordinatesFromLines(_inputFilePath);
+
+        int minCoordX = coordinates.Min(coord => coord[0]);
+        int minCoordY = coordinates.Min(coord => coord[1]);
+
+        foreach (int[] coordinate in coordinates)
+        {
+            coordinate[0] -= minCoordX;
+            coordinate[1] -= minCoordY;
+        }
+
+
+
+        int maxCoordX = coordinates.Max(coord => coord[0]) - minCoordX;
+        int maxCoordY = coordinates.Max(coord => coord[1]) - minCoordY;
+
+        List<int[]> rows = new();
+        for (int yIndex = 0; yIndex <= maxCoordY; yIndex++)
+        {
+            rows.Add(new int[maxCoordX+1]);
+        }
+        int[][] grid = rows.ToArray();
+
+
+        int[] currentCoordinate = coordinates[0];
+        grid[currentCoordinate[1]][currentCoordinate[0]] = 1;
+
+        for (int i = 1; i < coordinates.Length; i++)
+        {
+            var nextCoordinate = coordinates[i];
+            grid[nextCoordinate[1]][nextCoordinate[0]] = 1;
+            
+            //determine the dimension to move in
+            int dimToMove = currentCoordinate[0] != nextCoordinate[0] ? 0 : 1;
+
+            int start = currentCoordinate[dimToMove];
+            int end = nextCoordinate[dimToMove];
+
+            bool up;
+            if (start <= end)
+            {
+                start++;
+                end--;
+                for (int step = start; step <= end; step++)
+                {
+                    if (dimToMove == 0)
+                    {
+                        grid[currentCoordinate[1]][step] = 2;
+                    }
+                    else
+                    {
+                        grid[step][currentCoordinate[0]] = 2;
+                    }
+                }
+            }
+            else
+            {
+                start--;
+                end++;
+                for (int step = start; step >= end; step--)
+                {
+                    if (dimToMove == 0)
+                    {
+                        grid[currentCoordinate[1]][step] = 2;
+                    }
+                    else
+                    {
+                        grid[step][currentCoordinate[0]] = 2;
+                    }
+                }
+            }
+            currentCoordinate = nextCoordinate;
+        }
+
+        foreach (int[] row in grid)
+        {
+            Console.WriteLine(string.Join(" ", row));
+        }
+
+        return 0;
     }
 
 }

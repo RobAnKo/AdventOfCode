@@ -154,10 +154,13 @@ public class Reader
         foreach (string line in lines)
         {
             string[] parts = line.Split(',', StringSplitOptions.RemoveEmptyEntries);
-            int x = int.Parse(parts[0]);
-            int y = int.Parse(parts[1]);
-            int z = int.Parse(parts[2]);
-            coordinates.Add([x,y,z]);
+            int len = parts.Length;
+            int[] coordinate = new int[len];
+            for (int i = 0; i < len; i++)
+            {
+                coordinate[i] = int.Parse(parts[i]);
+            }
+            coordinates.Add(coordinate);
         }
         return coordinates.ToArray();
     }
